@@ -1,0 +1,213 @@
+<!-- 
+For icons
+https://fontawesome.com/icons
+  -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link href='https://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet'>
+</head>
+<body>
+    <div class="dashboard">
+        <div class="header">
+            <h1>Dashboard</h1>
+            <div class="status-indicator">
+                <div id="status-light" class="indicator standby"></div>
+                <span id="status-text">System Standby</span>
+            </div>
+        </div>
+        
+        <div class="main-section">
+            <div class="panel">
+                <h2>OBJECTS</h2>
+                <div id="objects-list" class="objects-list">
+                    <div class="object-item">
+                        <div class="object-type">
+                            <i class="fas fa-car object-icon"></i>
+                            Car
+                        </div>
+                        <div>
+                            420%
+                            <div class="confidence-bar">
+                                <div class="confidence-level" style="width: 420%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="object-item">
+                        <div class="object-type">
+                            <i class="fas fa-walking object-icon"></i>
+                            Pedestrian
+                        </div>
+                        <div>
+                            6969%
+                            <div class="confidence-bar">
+                                <div class="confidence-level" style="width: 6969%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="object-item">
+                        <div class="object-type">
+                            <i class="fas fa-solid fa-truck object-icon"></i>
+                            Random Value
+                        </div>
+                        <div>
+                            6969%
+                            <div class="confidence-bar">
+                                <div class="confidence-level" style="width: 6969%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="panel controls">
+                <h2>Controls</h2>
+                <button id="toggle-autonomous" class="button primary">
+                    Enable Self-Driving Mode
+                </button>
+                <button class="button danger">
+                    Emergency Stop
+                </button>
+                
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-label">SPEED</div>
+                        <div id="speed" class="stat-value">69.69</div>
+                        <div class="stat-label">KM/H</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">STEERING</div>
+                        <div id="steering" class="stat-value">69.2°</div>
+                        <div class="stat-label">ANGLE</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">BATTERY</div>
+                        <div id="battery" class="stat-value">87%</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">CPU</div>
+                        <div id="cpu" class="stat-value">32%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h2 class="section-title">camera</h2>
+        <div class="panel camera-feed">
+            <h2>Camera Feed</h2>
+            <img id="camera" src="/video_feed" alt="Camera Feed">
+        </div>
+
+
+        <h2 class="section-title">LIDAR</h2>
+                <div class="panel lidar-display">
+                    <h2>LiDAR PLACEHOLDER</h2>
+                </div>
+        
+        <h2 class="section-title">Information</h2>
+        
+        <div class="statistics-grid">
+            <div class="panel">
+                <h2>Vehicle Status</h2>
+                <div class="vehicle-info">
+                    <div class="stat-item">
+                        <div class="stat-label">POWER USAGE</div>
+                        <div class="stat-value">69</div>
+                        <div class="stat-label">kW/h</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="panel">
+                <h2>temp</h2>
+                <div class="gauge-container">
+                    <div>
+                        <div class="gauge">
+                           
+                            <div class="gauge-fill" style="height: 21%;"></div> <!-- change the % value  -->
+                            <div class="gauge-value">21°C</div>
+                        </div>
+                        <div class="gauge-label">TEMP</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="panel">
+                <h2>System Errors</h2>
+                <ul class="system-errors">
+                    <li class="error-item warning">
+                        <div class="error-content">
+                            <div>Error Message</div>
+                            <div class="error-time">21:69:420</div>
+                        </div>
+                    </li>
+                    <li class="error-item info">
+                        <div class="error-content">
+                            <div>Hint Message</div>
+                            <div class="error-time">03:00:12</div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        <h2 class="section-title">Extra information</h2>
+        <div class="panel">
+            <h2>aaa</h2>
+            <div id="map" style="width: 100%; height: 250px; background-color: #333; border-radius: 4px; display: flex; justify-content: center; align-items: center;">
+                <div>
+                    <div style="text-align: center; margin-bottom: 20px;">PLACEHOLDER</div>
+                </div>
+            </div>
+        </div>
+
+        <h2 class="section-title">Extra information</h2>
+
+        <div class="panel">
+            <h2>Empty Panel</h2>
+        </div>
+
+    <script>        
+        
+        
+        // Fetch data from server once
+        function fetchInitialData() {
+            fetch('/api/car_data')
+                .then(response => response.json())
+                .then(data => {
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        }
+        
+        // Toggle autonomous mode
+        document.getElementById('toggle-autonomous').addEventListener('click', function() {
+            // Get current button text
+            const buttonText = this.textContent.trim();
+            
+            if (buttonText === 'Enable Self-Driving Mode') {
+                this.textContent = 'Disable Self-Driving Mode';
+                this.classList.remove('primary');
+                this.classList.add('danger');
+                document.getElementById('status-light').className = 'indicator active';
+                document.getElementById('status-text').textContent = 'System Active';
+            } else {
+                this.textContent = 'Enable Self-Driving Mode';
+                this.classList.remove('danger');
+                this.classList.add('primary');
+                document.getElementById('status-light').className = 'indicator standby';
+                document.getElementById('status-text').textContent = 'System Standby';
+            }
+        });
+        
+        // Initial fetch
+        fetchInitialData();
+    </script>
+</body>
+</html>

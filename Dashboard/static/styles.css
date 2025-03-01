@@ -1,0 +1,257 @@
+body {
+    font-family: 'Montserrat', serif;
+    margin: 0;
+    padding: 0;
+    background-color: #1e1e1e;
+    color: #ffffff;
+}
+.dashboard {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+    min-height: 100vh;
+}
+.header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #2a2a2a;
+    padding: 15px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+.main-section {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+}
+.panel {
+    background-color: #2a2a2a;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.camera-feed {
+    position: relative;
+    overflow: hidden;
+    width: 95%;
+    height: 1280px; /* 16:9 aspect ratio, camera uses FULLHD */
+    margin: 0 auto; /* Center horizontally */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.camera-feed img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 4px;
+}
+.camera-feed h2 {
+    position: absolute;
+    top: 10px;
+    left: 15px;
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 5px 10px;
+    border-radius: 4px;
+    margin: 0;
+}
+.lidar-display {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    height: 350px;
+    margin: 0; /* Center horizontally */
+}
+.controls {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+.status-indicator {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+.indicator {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+.active {
+    background-color: #4caf50;
+}
+.standby {
+    background-color: #ff9800;
+}
+.error {
+    background-color: #f44336;
+}
+.button {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 21px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+.primary {
+    background-color: #2196f3;
+    color: white;
+}
+.danger {
+    background-color: #f44336;
+    color: white;
+}
+.stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+.stat-item {
+    text-align: center;
+    padding: 10px;
+    background-color: #333;
+    border-radius: 4px;
+}
+.stat-value {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 5px 0;
+}
+.stat-label {
+    font-size: 12px;
+    color: #aaa;
+}
+.objects-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+.object-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 10px;
+    border-bottom: 1px solid #444;
+}
+.object-type {
+    display: flex;
+    align-items: center;
+}
+.object-icon {
+    margin-right: 10px;
+    font-size: 16px;
+}
+.confidence-bar {
+    height: 6px;
+    width: 100px;
+    background-color: #444;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-left: 10px;
+}
+.confidence-level {
+    height: 100%;
+    background-color: #4caf50;
+}
+
+.statistics-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.vehicle-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.gauge-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 150px;
+}
+
+.gauge {
+    width: 120px;
+    height: 120px;
+    position: relative;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 8px solid #333;
+}
+
+.gauge-fill {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    background-color: #2196f3;
+    transition: height 0.5s;
+}
+
+.gauge-value {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.gauge-label {
+    margin-top: 10px;
+    text-align: center;
+    font-size: 14px;
+    color: #aaa;
+}
+
+.system-errors {
+    padding: 0;
+    list-style: none;
+}
+
+.error-item {
+    display: flex;
+    padding: 10px;
+    border-left: 4px solid;
+    margin-bottom: 10px;
+    background-color: #333;
+}
+
+.error-item.warning {
+    border-left-color: #ff9800;
+}
+
+.error-item.error {
+    border-left-color: #f44336;
+}
+
+.error-item.info {
+    border-left-color: #2196f3;
+}
+
+.error-content {
+    flex-grow: 1;
+}
+
+.error-time {
+    color: #aaa;
+    font-size: 12px;
+}
+
+.section-title {
+    margin-top: 30px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #444;
+    padding-bottom: 5px;
+}
