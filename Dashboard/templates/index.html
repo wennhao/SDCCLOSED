@@ -175,7 +175,13 @@ https://fontawesome.com/icons
         </div>
 
     <script>        
-        
+        function refreshCameraFeed() {
+            var cameraImage = document.getElementById("camera");
+            cameraImage.src = "/video_feed?timestamp=" + new Date().getTime();
+        }
+
+        setInterval(refreshCameraFeed, 100); // Refresh every 100ms (adjust as needed)
+            
         // Fetch data from server once
         function fetchInitialData() {
             fetch('/api/car_data')
