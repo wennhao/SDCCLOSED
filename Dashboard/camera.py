@@ -2,7 +2,7 @@ from ultralytics import YOLO
 import cv2
 import numpy as np
 
-model = YOLO("yolov8n.pt")
+model = YOLO("models/yolov8n.pt")
 
 
 cam = cv2.VideoCapture(0) # change to correct camera (0 for webcam)

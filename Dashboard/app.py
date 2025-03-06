@@ -1,7 +1,7 @@
 from flask import Flask, render_template, jsonify, Response
 import numpy as np
 from datetime import datetime
-# from camera import generate_frames
+from camera import generate_frames
 
 app = Flask(__name__)
 
@@ -27,9 +27,9 @@ def index():
     return render_template('index.html')
 
 
-# @app.route('/video_feed')
-# def video_feed():
-#     return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+@app.route('/video_feed')
+def video_feed():
+    return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
 if __name__ == '__main__':
