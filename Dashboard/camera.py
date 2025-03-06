@@ -7,11 +7,22 @@ model = YOLO("yolov8n.pt")
 
 cam = cv2.VideoCapture(0) # change to correct camera (0 for webcam)
 
+# Set the camera resolution (adjust based on your dashboard layout)
+FRAME_WIDTH = 800   # Change to match dashboard width
+FRAME_HEIGHT = 600  # Change to match dashboard height
+cam.set(cv2.CAP_PROP_FRAME_WIDTH, FRAME_WIDTH)
+cam.set(cv2.CAP_PROP_FRAME_HEIGHT, FRAME_HEIGHT)
+
 def generate_frames():
     while True:
         success, frame = cam.read()
         if not success:
             break
+
+
+        # Resize the frame to match your dashboard's layout
+        frame = cv2.resize(frame, (FRAME_WIDTH, FRAME_HEIGHT))
+
 
         # make frames lines only
         gray_image = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
