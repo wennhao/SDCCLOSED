@@ -3,7 +3,10 @@ import cv2
 import numpy as np
 
 model = YOLO("yolov8n.pt")
-#cam = cv2.VideoCapture(0) # verander naar camera index
+model.export(format="openvino") # export in openvino format
+ov_model = YOLO("yolov8n_openvino_model/") # load the exported openvino model
+
+#cam = cv2.VideoCapture(0) # change to camera index
 
 cam = cv2.VideoCapture('motor.mp4')
 ret, frame = cam.read()
@@ -15,6 +18,8 @@ while ret:
 
     # reduce quality based on fx and fy
     frame = cv2.resize(frame, (0, 0), fx = 0.5, fy = 0.5)
+
+    ### LINE DETECTION
 
     # make grayscale
     gray_image = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
@@ -78,7 +83,9 @@ while ret:
 
         line_image = cv2.fillPoly(frame, [polygon_points], color=(0, 255, 0))
 
-    results = model(frame)
+
+    ### OBJECT DETECTION
+    results = ov_model(frame)
     boxes = results[0].boxes
 
     for box in boxes:
