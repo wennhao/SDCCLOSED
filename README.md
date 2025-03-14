@@ -17,23 +17,19 @@ This project requires Python, Flask, OpenCV and numpy to run
 > You must have python pre-installed to run the project!
 > Open up your **terminal** and run the following commands
 
-```
-cd Dashboard
-```
-
 Create a new virtual environment
 ```
-python3 -m venv venv
+python3 -m venv .venv
 ```
 
 On Windows
  ```
-venv\Scripts\activate
+.venv\Scripts\activate
 ```
 
 Mac / Linux users
 ```
-source venv/bin/activate
+source .venv/bin/activate
 ```
 
 download the needed libraries
