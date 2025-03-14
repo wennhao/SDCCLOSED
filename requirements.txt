@@ -2,3 +2,4 @@ numpy
 flask
 opencv-python
 ultralytics
+python-can
