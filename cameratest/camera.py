@@ -17,20 +17,20 @@ while ret:
     frame = cv2.resize(frame, (0, 0), fx = 0.5, fy = 0.5)
 
     # make grayscale
-    #gray_image = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
+    gray_image = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
 
     # slightly blur
-    #blurred = cv2.GaussianBlur(frame, (5, 5), 0)
+    blurred = cv2.GaussianBlur(frame, (5, 5), 0)
 
-    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    #hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     # H: 0-179
     # S: 0-255
     # B: 0-255
-    low = np.array([0, 0, 160])
-    high = np.array([179, 100, 255])
-    mask_line_image = cv2.inRange(hsv, low, high)
+    #low = np.array([0, 0, 160])
+    #high = np.array([179, 100, 255])
+    #mask_line_image = cv2.inRange(hsv, low, high)
 
-    canny_image = cv2.Canny(mask_line_image, 75, 150)
+    canny_image = cv2.Canny(blurred, 75, 150)
 
     mask = np.zeros_like(canny_image)
     height = mask.shape[0]
@@ -64,10 +64,14 @@ while ret:
     # fill polygons for lanes (needs mask)
     polygon_points = []
     line_image = frame
+    linepoints = []
     if lines is not None:
         for line in lines:
             polygon_points.append((line[0][0], line[0][1]))
             polygon_points.append((line[0][2], line[0][3]))
+
+            linepoints.append([line[0][0], line[0][1]])
+            linepoints.append([line[0][2], line[0][3]])
     
     if len(polygon_points) > 0:
         polygon_points = np.array(polygon_points, dtype=np.int32).reshape((-1, 1, 2))
@@ -87,6 +91,13 @@ while ret:
             cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 255), 2)
             cv2.putText(frame, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 2)
 
+    average = [0, 0]
+    for point in linepoints:
+        average[0] += point[0]
+        average[1] += point[1]
+    
+    average = [int(average[0]/len(linepoints)), int(average[1]/len(linepoints))]
+    frame = cv2.rectangle(frame, (average[0]-50, average[1]+50), (average[0]+50, average[1]-50), (0, 0, 255), 5)
 
     cv2.imshow('Camera', frame)
 
