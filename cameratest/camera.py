@@ -8,7 +8,7 @@ ov_model = YOLO("yolov8n_openvino_model/") # load the exported openvino model
 
 #cam = cv2.VideoCapture(0) # change to camera index
 
-cam = cv2.VideoCapture('motor.mp4')
+cam = cv2.VideoCapture('roadtest.mp4')
 ret, frame = cam.read()
 
 while ret:
