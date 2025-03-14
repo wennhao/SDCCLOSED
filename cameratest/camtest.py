@@ -8,7 +8,7 @@ ov_model = YOLO('yolov8n_openvino_model/') # load the exported openvino model
 
 #cam = cv2.VideoCapture(0) # change to camera index
 
-cam = cv2.VideoCapture('roadtest.mp4')
+cam = cv2.VideoCapture('nlroad.mp4')
 ret, frame = cam.read()
 
 while ret:
@@ -42,8 +42,8 @@ while ret:
     width = mask.shape[1]
     center_x = width//2 - 21
     center_y = height//2 + 250
-    top_width = 100
-    bottom_width = 750
+    top_width = 150
+    bottom_width = 900
     mask_height = 250
     roi = np.array([[(center_x+bottom_width//2, center_y+mask_height//2), (center_x-bottom_width//2, center_y+mask_height//2), (center_x-top_width//2, center_y-mask_height//2), (center_x+top_width//2, center_y-mask_height//2)]], dtype=np.int32)
     #roi = np.array([[(center_x+500, center_y+500), (center_x-500, center_y+500), (center_x-500, center_y-500), (center_x+500, center_y-500)]], dtype=np.int32)
