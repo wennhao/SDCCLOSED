@@ -40,11 +40,11 @@ while ret:
     mask = np.zeros_like(canny_image)
     height = mask.shape[0]
     width = mask.shape[1]
-    center_x = width//2
-    center_y = height//2 - 50
-    top_width = 200
-    bottom_width = 500
-    mask_height = 150
+    center_x = width//2 - 21
+    center_y = height//2 + 250
+    top_width = 100
+    bottom_width = 750
+    mask_height = 250
     roi = np.array([[(center_x+bottom_width//2, center_y+mask_height//2), (center_x-bottom_width//2, center_y+mask_height//2), (center_x-top_width//2, center_y-mask_height//2), (center_x+top_width//2, center_y-mask_height//2)]], dtype=np.int32)
     #roi = np.array([[(center_x+500, center_y+500), (center_x-500, center_y+500), (center_x-500, center_y-500), (center_x+500, center_y-500)]], dtype=np.int32)
     #height_offset = -120 # offset center (horizon)
@@ -103,8 +103,9 @@ while ret:
         average[0] += point[0]
         average[1] += point[1]
     
-    average = [int(average[0]/len(linepoints)), int(average[1]/len(linepoints))]
-    frame = cv2.rectangle(frame, (average[0]-50, average[1]+50), (average[0]+50, average[1]-50), (0, 0, 255), 5)
+    if len(linepoints) > 0:
+        average = [int(average[0]/len(linepoints)), int(average[1]/len(linepoints))]
+        frame = cv2.rectangle(frame, (average[0]-50, average[1]+50), (average[0]+50, average[1]-50), (0, 0, 255), 5)
 
     cv2.imshow('Camera', frame)
 
