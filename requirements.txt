@@ -1,5 +1,6 @@
-numpy
-flask
-opencv-python
-ultralytics
-python-can
+numpy==1.26.4
+flask==3.0.3
+opencv-python==4.11.0.86
+ultralytics==8.3.89
+python-can==4.5.0
+openvino==
