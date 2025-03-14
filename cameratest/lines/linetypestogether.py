@@ -28,12 +28,10 @@ def detect_lanes(video_path):
         edges = cv2.Canny(blurred, 50, 150)
 
         height, width = edges.shape
-        region_vertices = [(0, height), (width // 2, height // 2), (width, height)] #links onder, midden, rechts boven
+        region_vertices = [(0, height), (width // 2, height // 2), (width, height)]
         roi = region_of_interest(edges, np.array([region_vertices], np.int32))
 
         lines = cv2.HoughLinesP(roi, 1, np.pi / 180, 50, np.array([]), minLineLength=25, maxLineGap=300)
-            # (image met mask, elke pixel checken, elke graden angle checken, placeholder voor output storage, 
-            # minimum lengte van een lijn om gedetecteerd te worden, maximum lengte tussen lijnen om 1 lijn voor te stellen)
 
         if lines is not None:
             for line in lines:

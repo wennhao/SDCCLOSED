@@ -4,15 +4,14 @@ import numpy as np
 def region_of_interest(img, vertices):
     mask = np.zeros_like(img)
     cv2.fillPoly(mask, vertices, 255)
-    masked_image = cv2.bitwise_and(img, mask)
-    return masked_image
+    masked = cv2.bitwise_and(img, mask)
+    return masked
 
-def get_x_at_y(y_target, x1, y1, x2, y2):
-    """ Returns the x-coordinate where the line (x1, y1) to (x2, y2) crosses y = y_target. """
-    if y1 == y2:  # Avoid division by zero
+def get_x_at_ytarget(y_target, x1, y1, x2, y2):
+    if y1 == y2:
         return None
-    x_at_y = int(x1 + (y_target - y1) * (x2 - x1) / (y2 - y1))
-    return x_at_y
+    x_at_target = int(x1 + ( ( (y_target - y1) * (x2 - x1) ) / (y2 - y1) ))
+    return x_at_target
 
 def detect_lanes(video_path):
     capture = cv2.VideoCapture(video_path)
@@ -41,23 +40,21 @@ def detect_lanes(video_path):
         right_x_values = []
         y_target = 500
 
-        if lines is not None:
-            for line in lines:
+        if lines is not None: #per frame
+            for line in lines: #per line in het frame
                 for x1, y1, x2, y2 in line:
-                    cv2.line(frame, (x1, y1), (x2, y2), (0, 0, 255), 5)  # Draw detected lines
+                    cv2.line(frame, (x1, y1), (x2, y2), (0, 0, 255), 5)
 
-                    # Find x where the line crosses y = 500
-                    x_at_500 = get_x_at_y(y_target, x1, y1, x2, y2)
-                    if x_at_500 is not None:
-                        if x_at_500 < width // 2:
-                            left_x_values.append(x_at_500)
-                        else:
-                            right_x_values.append(x_at_500)
+                    x_at_target = get_x_at_ytarget(y_target, x1, y1, x2, y2)
+                    if x_at_target is not None:
+                        if x_at_target < width // 2: #linker helft scherm
+                            left_x_values.append(x_at_target)
+                        else: #rechter helft scherm
+                            right_x_values.append(x_at_target)
 
-        # Compute average x and draw vertical line if both sides detected
         if left_x_values and right_x_values:
             avg_x = int((np.mean(left_x_values) + np.mean(right_x_values)) / 2)
-            cv2.line(frame, (avg_x, 480), (avg_x, 520), (255, 255, 0), 3)  # Vertical guide line
+            cv2.line(frame, (avg_x, 490), (avg_x, 510), (255, 255, 0), 3)
 
         cv2.imshow("Lane Detection", frame)
 
