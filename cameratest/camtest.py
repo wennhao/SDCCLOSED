@@ -2,9 +2,9 @@ from ultralytics import YOLO
 import cv2
 import numpy as np
 
-model = YOLO("yolov8n.pt")
-model.export(format="openvino") # export in openvino format
-ov_model = YOLO("yolov8n_openvino_model/") # load the exported openvino model
+model = YOLO('yolov8n.pt')
+model.export(format='openvino') # export in openvino format
+ov_model = YOLO('yolov8n_openvino_model/') # load the exported openvino model
 
 #cam = cv2.VideoCapture(0) # change to camera index
 
