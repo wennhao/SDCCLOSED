@@ -56,6 +56,14 @@ def detect_lanes(video_path):
             avg_x = int((np.mean(left_x_values) + np.mean(right_x_values)) / 2)
             cv2.line(frame, (avg_x, 490), (avg_x, 510), (255, 255, 0), 3)
 
+
+        kart_middle_x = width / 2
+        if kart_middle_x - 50 > avg_x:
+            print("turn left")
+        elif kart_middle_x + 50 < avg_x:
+            print("turn right")
+
+
         cv2.imshow("Lane Detection", frame)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
