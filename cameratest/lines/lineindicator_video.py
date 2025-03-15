@@ -10,7 +10,7 @@ def region_of_interest(img, vertices):
 def get_x_at_ytarget(y_target, x1, y1, x2, y2):
     if y1 == y2:
         return None
-    x_at_target = int(x1 + ( ( (y_target - y1) * (x2 - x1) ) / (y2 - y1) ))
+    x_at_target = int(x1 + (((y_target - y1) * (x2 - x1) ) / (y2 - y1)))
     return x_at_target
 
 def detect_lanes(video_path):
