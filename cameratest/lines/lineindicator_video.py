@@ -10,7 +10,7 @@ def region_of_interest(img, vertices):
 def get_x_at_ytarget(y_target, x1, y1, x2, y2):
     if y1 == y2:
         return None
-    x_at_target = int(x1 + ( ( (y_target - y1) * (x2 - x1) ) / (y2 - y1) ))
+    x_at_target = int(x1 + (((y_target - y1) * (x2 - x1) ) / (y2 - y1)))
     return x_at_target
 
 def detect_lanes(video_path):
@@ -55,6 +55,14 @@ def detect_lanes(video_path):
         if left_x_values and right_x_values:
             avg_x = int((np.mean(left_x_values) + np.mean(right_x_values)) / 2)
             cv2.line(frame, (avg_x, 490), (avg_x, 510), (255, 255, 0), 3)
+
+
+        kart_middle_x = width / 2
+        if kart_middle_x - 50 > avg_x:
+            print("turn left")
+        elif kart_middle_x + 50 < avg_x:
+            print("turn right")
+
 
         cv2.imshow("Lane Detection", frame)
 
