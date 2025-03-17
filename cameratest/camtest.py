@@ -42,9 +42,9 @@ while ret:
     width = mask.shape[1]
     center_x = width//2
     center_y = height//2 + 250
-    top_width = 150
+    top_width = 200
     bottom_width = 1000
-    mask_height = 250
+    mask_height = 300
     roi = np.array([[(center_x+bottom_width//2, center_y+mask_height//2), (center_x-bottom_width//2, center_y+mask_height//2), (center_x-top_width//2, center_y-mask_height//2), (center_x+top_width//2, center_y-mask_height//2)]], dtype=np.int32)
     #roi = np.array([[(center_x+500, center_y+500), (center_x-500, center_y+500), (center_x-500, center_y-500), (center_x+500, center_y-500)]], dtype=np.int32)
     #height_offset = -120 # offset center (horizon)
@@ -95,8 +95,8 @@ while ret:
         #if model.names[cls] == 'car' and conf >= 0.5:
         if conf >= 0.5:
             label = f'{model.names[cls]} {conf:.2f}'
-            cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 255), 2)
-            cv2.putText(frame, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 2)
+            #cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 255), 2)
+            #cv2.putText(frame, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 2)
 
     average = [0, 0]
     for point in linepoints:
@@ -105,9 +105,9 @@ while ret:
     
     if len(linepoints) > 0:
         average = [int(average[0]/len(linepoints)), int(average[1]/len(linepoints))]
-        frame = cv2.rectangle(frame, (average[0]-50, average[1]+50), (average[0]+50, average[1]-50), (0, 0, 255), 5)
+        #frame = cv2.rectangle(frame, (average[0]-50, average[1]+50), (average[0]+50, average[1]-50), (0, 0, 255), 5)
 
-    cv2.imshow('Camera', masked_image)
+    cv2.imshow('Camera', frame)
 
     if cv2.waitKey(1) == ord('q'):
         break
