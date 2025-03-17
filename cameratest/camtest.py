@@ -81,7 +81,7 @@ while ret:
     if len(polygon_points) > 0:
         polygon_points = np.array(polygon_points, dtype=np.int32).reshape((-1, 1, 2))
 
-        line_image = cv2.fillPoly(frame, [polygon_points], color=(0, 255, 0))
+        #line_image = cv2.fillPoly(frame, [polygon_points], color=(0, 255, 0))
 
 
     ### OBJECT DETECTION
@@ -95,8 +95,8 @@ while ret:
         #if model.names[cls] == 'car' and conf >= 0.5:
         if conf >= 0.5:
             label = f'{model.names[cls]} {conf:.2f}'
-            #cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 255), 2)
-            #cv2.putText(frame, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 2)
+            cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 255), 2)
+            cv2.putText(frame, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 2)
 
     average = [0, 0]
     for point in linepoints:
