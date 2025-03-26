@@ -72,5 +72,5 @@ def detect_lanes(video_path):
     capture.release()
     cv2.destroyAllWindows()
 
-video_path = 'C:\\Vakken\\Project 78 (SDC)\\SDCCLOSED\\cameratest\\lines\\The Dutch Superhighway_ Utrecht to Amsterdam - 🇳🇱 Netherlands [4K HDR] Driving Tour.mp4'
+video_path = 'C:\\Vakken\\Project 78 (SDC)\\SDCCLOSED\\cameratest\\lines\\.mp4'
 detect_lanes(video_path)
