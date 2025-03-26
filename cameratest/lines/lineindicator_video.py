@@ -31,7 +31,7 @@ def detect_lanes(video_path):
         edges = cv2.Canny(blurred, 50, 150)
 
         height, width = edges.shape
-        region_vertices = [(0, height), (width // 2, height // 2), (width, height)]
+        region_vertices = [(0, height), (width // 2, height // 1.75), (width, height)]
         roi = region_of_interest(edges, np.array([region_vertices], np.int32))
 
         lines = cv2.HoughLinesP(roi, 1, np.pi / 180, 50, np.array([]), minLineLength=25, maxLineGap=300)
@@ -66,11 +66,11 @@ def detect_lanes(video_path):
 
         cv2.imshow("Lane Detection", frame)
 
-        if cv2.waitKey(1) & 0xFF == ord('q'):
+        if cv2.waitKey(25) & 0xFF == ord('q'):
             break
 
     capture.release()
     cv2.destroyAllWindows()
 
-video_path = 'input.mp4'
+video_path = 'C:\\Vakken\\Project 78 (SDC)\\SDCCLOSED\\cameratest\\lines\\The Dutch Superhighway_ Utrecht to Amsterdam - 🇳🇱 Netherlands [4K HDR] Driving Tour.mp4'
 detect_lanes(video_path)
