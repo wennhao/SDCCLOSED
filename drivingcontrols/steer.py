@@ -6,10 +6,7 @@ import can
 CAN_MESSAGE_SENDING_SPEED = 0.04
 
 
-def initialize_can():
-    """
-    Set up the can bus interface
-    """
+def initialize_can(): #Set up the can bus interface
     bus = can.Bus(interface='socketcan', channel='can0', bitrate=500000)
     return bus
     
@@ -18,6 +15,10 @@ def main():
     bus = initialize_can()
     
     steer_message = can.Message(arbitration_id=0x220, data=[0, 0, 0, 0, 0, 0, 0, 0], is_extended_id=False)
+    # data[0,1,2,3] kunnen waardes hebben van 0 tm 255 (in hexadecimaal?)
+    # de 4 byte kan een waarde hebben van -1.25f tm 1.25f. -1.25f is maximaal naar links, 1.25f maximaal naar rechts
+    
+    # note: de waarde moet little-endian zijn 
     steer_task = bus.send_periodic(steer_message, CAN_MESSAGE_SENDING_SPEED)
 
     steer_message.data = list(bytearray(struct.pack("f", 0.3))) + [0]*4
