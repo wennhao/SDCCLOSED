@@ -3,10 +3,10 @@ import cv2
 import numpy as np
 from roboflow import Roboflow
 
-model = YOLO('best.pt')
+model = YOLO('yolov8n.pt')
 
 model.export(format='openvino') # export in openvino format
-ov_model = YOLO('best_openvino_model/') # load the exported openvino model
+ov_model = YOLO('yolov8n_openvino_model/') # load the exported openvino model
 
 cam = cv2.VideoCapture('objectdettest.mp4')
 ret, frame = cam.read()
