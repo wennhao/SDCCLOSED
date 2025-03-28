@@ -17,7 +17,7 @@ import cv2
 import numpy as np
 
 y_target = 500
-x_target = None # standaard positie van de lijn bij y=500
+x_target = None #standaard positie van de lijn bij y=500
 
 def region_of_interest(img, vertices):
     mask = np.zeros_like(img)
@@ -32,10 +32,8 @@ def get_x(lines):
         return int(x_coord)
     return None
 
-def detect_lanes():
-#def detect_lanes(path):    
-    #capture = cv2.VideoCapture(path)
-    capture = cv2.VideoCapture(0) # kart camera
+def detect_lanes(path):
+    capture = cv2.VideoCapture(path) # kart camera
 
     if not capture.isOpened():
         print("Error: Could not open video.")
@@ -48,7 +46,9 @@ def detect_lanes():
             break
 
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
         blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+
         edges = cv2.Canny(blurred, 50, 150)
 
         height, width = edges.shape
@@ -63,18 +63,23 @@ def detect_lanes():
             for line in lines:
                 for x1, y1, x2, y2 in line:
                     if x1 != x2 and y1 != y2:
-                        x_at_target_values.append(get_x(line)) # alleen als het bepaalde afstand heeft van x_target ?]
+                        x_at_target_values.append(get_x(line))
+                        cv2.line(frame, (x1, y1), (x2, y2), (0, 0, 255), 5)
 
         if x_at_target_values:
             x_at_target = int(np.mean(x_at_target_values))
-            if x_at_target < x_target - 50: # voorbeeld waardes
+            if x_at_target < x_target - 50: #voorbeeld waardes
                 print("steer left")
-            elif x_at_target > x_target + 50: # voorbeeld waardes
+            elif x_at_target > x_target + 50: #voorbeeld waardes
                 print("steer right")
+
+        cv2.imshow("Lane Detection", frame)
 
         if cv2.waitKey(25) & 0xFF == ord('q'):
             break
 
     capture.release()
+    cv2.destroyAllWindows()
 
-detect_lanes()
+path = 'C:\\Vakken\\Project 78 (SDC)\\SDCCLOSED\\cameratest\\lines\\input.mp4'
+detect_lanes(path)
