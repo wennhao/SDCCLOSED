@@ -1,7 +1,6 @@
 from ultralytics import YOLO
 import cv2
 import numpy as np
-from roboflow import Roboflow
 
 model = YOLO('yolov8n.pt')
 
