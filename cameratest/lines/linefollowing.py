@@ -34,7 +34,6 @@ def get_x(lines):
 
 def detect_lanes(path):
     capture = cv2.VideoCapture(path)
-    # capture = cv2.VideoCapture(0) # kart camera
 
     if not capture.isOpened():
         print("Error: Could not open video.")
@@ -73,10 +72,11 @@ def detect_lanes(path):
             #hoe verder x_at_target van x_target vandaan is, hoe meer er wordt gestuurd
         print(x_at_target)
 
-        if cv2.waitKey(25) & 0xFF == ord('q'):
+        if cv2.waitKey(100) & 0xFF == ord('q'):
             break
 
     capture.release()
 
-path = 'C:\\Vakken\\Project 78 (SDC)\\SDCCLOSED\\cameratest\\lines\\input.mp4'
+# path = 'C:\\Vakken\\Project 78 (SDC)\\SDCCLOSED\\cameratest\\lines\\input.mp4'
+path = 1
 detect_lanes(path)

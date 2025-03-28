@@ -1,23 +1,8 @@
-"""
-word gerunt op rechter en linker camera
-
-pakt een vast y coordinaat (500) op het scherm en kijkt waar de lijn op de x-as ligt
-
-als verder naar links is dan een bepaalde x value: stuur naar rechts
-als verder naar rechts is dan een bepaalde x value: stuur naar links
-
-
-linker bocht (linker lijn volgen) initiatie
-rij naar links totdat de op de linker camera de stuur statements aangeroepen worden
-
-daarna als stuur angle rond 0 is dan terug naar rechter lijn
-"""
-
 import cv2
 import numpy as np
 
 y_target = 500
-x_target = None #standaard positie van de lijn bij y=500
+x_target = 0 #standaard positie van de lijn bij y=500
 
 def region_of_interest(img, vertices):
     mask = np.zeros_like(img)
@@ -75,11 +60,12 @@ def detect_lanes(path):
 
         cv2.imshow("Lane Detection", frame)
 
-        if cv2.waitKey(25) & 0xFF == ord('q'):
+        if cv2.waitKey(100) & 0xFF == ord('q'):
             break
 
     capture.release()
     cv2.destroyAllWindows()
 
-path = 'C:\\Vakken\\Project 78 (SDC)\\SDCCLOSED\\cameratest\\lines\\input.mp4'
+# path = 'C:\\Vakken\\Project 78 (SDC)\\SDCCLOSED\\cameratest\\lines\\input.mp4'
+path = 1
 detect_lanes(path)
