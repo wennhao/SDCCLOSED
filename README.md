@@ -14,26 +14,33 @@ This project requires Python, Flask, OpenCV and numpy to run
 
 ## How to run the project?
 > [!IMPORTANT]
-> You must have python pre-installed to run the project!
+> This project requires python 3.12 installed
 > Open up your **terminal** and run the following commands
 
 ```
-cd Dashboard
+pip install --upgrade pip
 ```
+
+```
+pip install --upgrade pip setuptools wheel
+```
+
 
 Create a new virtual environment
 ```
-python3 -m venv venv
+python3.12 -m venv .venv
 ```
-
+```
+ Set-ExecutionPolicy Unrestricted -Scope Process
+```
 On Windows
  ```
-venv\Scripts\activate
+.venv\Scripts\activate
 ```
 
 Mac / Linux users
 ```
-source venv/bin/activate
+source .venv/bin/activate
 ```
 
 download the needed libraries
