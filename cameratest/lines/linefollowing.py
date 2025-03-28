@@ -17,7 +17,7 @@ import cv2
 import numpy as np
 
 y_target = 500
-x_target = None # standaard positie van de lijn bij y=500
+x_target = 0 # standaard positie van de lijn bij y=500
 
 def region_of_interest(img, vertices):
     mask = np.zeros_like(img)
@@ -32,10 +32,9 @@ def get_x(lines):
         return int(x_coord)
     return None
 
-def detect_lanes():
-#def detect_lanes(path):    
-    #capture = cv2.VideoCapture(path)
-    capture = cv2.VideoCapture(0) # kart camera
+def detect_lanes(path):
+    capture = cv2.VideoCapture(path)
+    # capture = cv2.VideoCapture(0) # kart camera
 
     if not capture.isOpened():
         print("Error: Could not open video.")
@@ -66,15 +65,18 @@ def detect_lanes():
                         x_at_target_values.append(get_x(line)) # alleen als het bepaalde afstand heeft van x_target ?]
 
         if x_at_target_values:
-            x_at_target = int(np.mean(x_at_target_values))
+            x_at_target = np.mean(x_at_target_values)
             if x_at_target < x_target - 50: # voorbeeld waardes
                 print("steer left")
             elif x_at_target > x_target + 50: # voorbeeld waardes
                 print("steer right")
+            #hoe verder x_at_target van x_target vandaan is, hoe meer er wordt gestuurd
+        print(x_at_target)
 
         if cv2.waitKey(25) & 0xFF == ord('q'):
             break
 
     capture.release()
 
-detect_lanes()
+path = 'C:\\Vakken\\Project 78 (SDC)\\SDCCLOSED\\cameratest\\lines\\input.mp4'
+detect_lanes(path)
