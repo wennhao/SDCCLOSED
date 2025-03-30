@@ -1,4 +1,5 @@
 .venv/
+venv/
 __pycache__/
 cameratest/yolov8n_openvino_model/metadata.yaml
 cameratest/yolov10n_openvino_model/metadata.yaml
