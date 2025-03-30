@@ -20,6 +20,7 @@ while ret:
     frame = cv2.resize(frame, (0, 0), fx = 0.5, fy = 0.5)
 
     ### OBJECT DETECTION
+
     results = ov_model(frame)
     boxes = results[0].boxes
 
