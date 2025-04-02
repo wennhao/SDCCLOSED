@@ -37,7 +37,8 @@ def detect_lanes(path):
         edges = cv2.Canny(blurred, 50, 150)
 
         height, width = edges.shape
-        region_vertices = [(0, height), (width // 2, height // 2), (width, height)]
+        # region_vertices = [(0, height), (width // 2, height // 2), (width, height)]
+        region_vertices = [(0, height // 2), (width, height // 2), (width, height), (0, height)]
         roi = region_of_interest(edges, np.array([region_vertices], np.int32))
 
         lines = cv2.HoughLinesP(roi, 1, np.pi / 180, 50, np.array([]), minLineLength=50, maxLineGap=300)
@@ -60,12 +61,12 @@ def detect_lanes(path):
 
         cv2.imshow("Lane Detection", frame)
 
-        if cv2.waitKey(100) & 0xFF == ord('q'):
+        if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
     capture.release()
     cv2.destroyAllWindows()
 
-# path = 'C:\\Vakken\\Project 78 (SDC)\\SDCCLOSED\\cameratest\\lines\\input.mp4'
-path = 1
+path = 'C:\\Vakken\\Project 78 (SDC)\\SDCCLOSED\\cameratest\\lines\\input.mp4'
+# path = 1
 detect_lanes(path)
