@@ -53,6 +53,13 @@ def main():
         throttle_msg = can.Message(arbitration_id=0x330, is_extended_id=False, data=[0, 0, 0, 0, 0, 0, 0, 0])
         throttle_task = bus.send_periodic(throttle_msg, CAN_MSG_SENDING_SPEED)
 
+        # brake_msg.data = [int(99*max(0, 1))] + 7*[0]
+        # beginnen met rijden
+        throttle_msg.data = [int(99*max(0, 1)), 0, 1] + 5*[0]
+        
+        # brake_msg.modify_data(brake_msg)
+        throttle_task.modify_data(throttle_msg)
+
         try:
             while (True):
                 _, frame = front_camera.read()
@@ -62,15 +69,11 @@ def main():
 
                 frame = np.resize(frame[:,:,::-1]/255, (1, 144, 256, 3)).astype(np.float32)
 
-                steering_angle, throttle, brake = predict(session, frame)
+                steering_angle = detect_lanes(frame)
 
-                brake_msg.data = [int(99*max(0, brake))] + 7*[0]
                 steering_msg.data = list(bytearray(struct.pack("f", float(steering_angle)))) + [0]*4
-                throttle_msg.data = [int(99*max(0, throttle)), 0, 1] + 5*[0]
 
-                brake_msg.modify_data(brake_msg)
                 steering_task.modify_data(steering_msg)
-                throttle_task.modify_data(throttle_msg)
 
         except KeyboardInterrupt:
             pass
@@ -128,13 +131,13 @@ def detect_lanes(frame):
         x_at_target = np.mean(x_at_target_values)
         if x_at_target > x_target - 50 & x_at_target < x_target + 50:
             print("steer forward")
-            return
+            return 0
         elif x_at_target < x_target - 50: # voorbeeld waardes
             print("steer left")
-            return
+            return -0.5
         elif x_at_target > x_target + 50: # voorbeeld waardes
             print("steer right")
-            return
+            return 0.5
         # hoe verder x_at_target van x_target vandaan is, hoe meer er wordt gestuurd ?
         # bij het insturen ook iets vertragen?
 
