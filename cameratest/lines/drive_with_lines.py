@@ -8,10 +8,11 @@ import struct
 
 CAN_MSG_SENDING_SPEED = .040
 
+"""
 def initialize_cameras() -> Dict[str, cv2.VideoCapture]:
-    """
-    Initialize the opencv camera capture devices.
-    """
+
+    #Initialize the opencv camera capture devices.
+
     config: video.CamConfig = video.get_camera_config()
     if not config:
         print('No valid video configuration found!')
@@ -27,6 +28,7 @@ def initialize_cameras() -> Dict[str, cv2.VideoCapture]:
         capture.set(cv2.CAP_PROP_FPS, 30) #make 60 to enable 60FPS
         cameras[camera_type] = capture
     return cameras
+"""    
 
 def initialize_can():
     bus = can.Bus(interface='socketcan', channel='can0', bitrate=500000)
