@@ -14,7 +14,7 @@ def initialize_cameras() -> Dict[str, cv2.VideoCapture]:
     """
     config: video.CamConfig = video.get_camera_config()
     if not config:
-        print('No valid video configuration found!', file=sys.stderr)
+        print('No valid video configuration found!')
         exit(1)
     cameras: Dict[str, cv2.VideoCapture] = dict()
     for camera_type, path in config.items():
@@ -35,8 +35,9 @@ def initialize_can():
 def main():
     bus = initialize_can()
 
-    cameras = initialize_cameras()
-    front_camera = cameras["front"]
+    # cameras = initialize_cameras()
+    # front_camera = cameras["front"]
+    front_camera = cv2.VideoCapture(2)
 
     try:
         brake_msg = can.Message(arbitration_id=0x110, is_extended_id=False, data=[0, 0, 0, 0, 0, 0, 0, 0])
@@ -58,7 +59,7 @@ def main():
                 steering = detect_lanes(frame)
                 
                 steering_msg.data = list(bytearray(struct.pack("f", float(steering)))) + [0]*4
-                throttle_msg.data = [int(99*max(0, throttle)), 0, 1] + 5*[0]
+                throttle_msg.data = [int(99*max(0, 10)), 0, 1] + 5*[0]
                 
                 brake_msg.modify_data(brake_msg)
                 steering_task.modify_data(steering_msg)
