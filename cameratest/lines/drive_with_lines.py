@@ -53,13 +53,11 @@ def main():
                 cv2.imshow('Camera preview', frame)
                 cv2.waitKey(1)
                 
-                frame = np.resize(frame[:,:,::-1]/255, (1, 144, 256, 3)).astype(np.float32)
+                #frame = np.resize(frame[:,:,::-1]/255, (1, 144, 256, 3)).astype(np.float32)
                 
-                #steering_angle, throttle, brake = predict(session, frame)
                 steering = detect_lanes(frame)
                 
-                brake_msg.data = [int(99*max(0, brake))] + 7*[0]
-                steering_msg.data = list(bytearray(struct.pack("f", float(steering_angle)))) + [0]*4
+                steering_msg.data = list(bytearray(struct.pack("f", float(steering)))) + [0]*4
                 throttle_msg.data = [int(99*max(0, throttle)), 0, 1] + 5*[0]
                 
                 brake_msg.modify_data(brake_msg)
