@@ -20,7 +20,6 @@ def get_x(line, y_norm):
     x = x1 + (y_norm - y1) / m
     return int(x)
 
-
 def detect_lanes(path):
     capture = cv2.VideoCapture(path)
 
@@ -42,9 +41,9 @@ def detect_lanes(path):
 
         height, width = edges.shape
         y_norm = int(height / 2)
-        x_norm = 575
+        x_norm = 550
 
-        roi_border = width // 5 * 2
+        roi_border = width // 8 * 3
 
         region_vertices = [(roi_border, 0), (width, 0), (width, height), (roi_border, height)] # rechterkant
         roi = region_of_interest(edges, np.array([region_vertices], np.int32))
@@ -86,4 +85,5 @@ def detect_lanes(path):
     cv2.destroyAllWindows()
 
 path = 'C:/Vakken/Jaar 2/Project 78 (SDC)/data/tests/testvideo2.mp4'
+# path = 'C:/Vakken/Jaar 2/Project 78 (SDC)/data/smalldemoright/output_video.mp4'
 detect_lanes(path)
