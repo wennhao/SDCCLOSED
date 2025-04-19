@@ -15,12 +15,13 @@ for byte 3 adjust the following values for the following effects:
 Move the kart forward
 This function sends a CAN message to move the kart forward.
 :param bus: The CAN bus object.
+:param speed: The speed of the kart (0-100).
 :return: The task object for the periodic message.
 """
-def move_forward(bus):
+def move_forward(bus, speed):
     motor_message = can.Message(
         arbitration_id=0x330,
-        data=[100, 0, 1, 0, 0, 0, 0, 0],
+        data=[speed, 0, 1, 0, 0, 0, 0, 0],
         is_extended_id=False
     )
     motor_task = bus.send_periodic(motor_message, CAN_MESSAGE_SENDING_SPEED)
@@ -45,12 +46,13 @@ def reset_motor(bus):
 Move the kart backward
 This function sends a CAN message to move the kart backward.
 :param bus: The CAN bus object.
+:param speed: The speed of the kart (0-100).
 :return: The task object for the periodic message.
 """
-def move_backward(bus):
+def move_backward(bus, speed):
     motor_message = can.Message(
         arbitration_id=0x330,
-        data=[100, 0, 2, 0, 0, 0, 0, 0],
+        data=[speed, 0, 2, 0, 0, 0, 0, 0],
         is_extended_id=False
     )
     motor_task = bus.send_periodic(motor_message, CAN_MESSAGE_SENDING_SPEED)
