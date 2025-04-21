@@ -1,9 +1,5 @@
 # SDCCLOSED
 
-## We are
-
-### amazing
-
 ## Get Started
 This project requires Python, Flask, OpenCV and numpy to run
 
