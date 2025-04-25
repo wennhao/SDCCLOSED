@@ -1,19 +1,15 @@
 from ultralytics import YOLO
 import cv2
 import numpy as np
+from roboflow import Roboflow
 
-model_name = 'yolov8n'
-
-model = YOLO(model_name+'.pt')
+model = YOLO('newbest.pt')
 
 model.export(format='openvino') # export in openvino format
-ov_model = YOLO(model_name+'_openvino_model/') # load the exported openvino model
+ov_model = YOLO('newbest_openvino_model/') # load the exported openvino model
 
-cam = cv2.VideoCapture('objectdettest.mp4')
+cam = cv2.VideoCapture('imgtovid/output_video.mp4')
 ret, frame = cam.read()
-
-total_speed = 0
-total_frames = 0
 
 while ret:
     ret, frame = cam.read()
@@ -37,11 +33,7 @@ while ret:
             cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 255), 2)
             cv2.putText(frame, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 2)
 
-    total_speed += results[0].speed['preprocess']+results[0].speed['inference']+results[0].speed['postprocess']
-    total_frames += 1
     cv2.imshow('Camera', frame)
 
     if cv2.waitKey(1) == ord('q'):
         break
-
-print('\nmodel:', model_name, '| avg speed:', total_speed/total_frames, '| total frames:', total_frames)
