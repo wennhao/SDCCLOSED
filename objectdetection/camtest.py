@@ -28,7 +28,7 @@ ov_model = YOLO('newbest_openvino_model/') # load the exported openvino model
 #path_to_video = 'imgtovid/output_video.mp4'
 path_to_camera = 0
 
-cam = cv2.VideoCapture(path_to_video)
+cam = cv2.VideoCapture(path_to_camera)
 ret, frame = cam.read()
 
 def execute(object_class):
