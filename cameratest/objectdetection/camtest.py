@@ -7,8 +7,9 @@ model = YOLO('newbest.pt')
 
 model.export(format='openvino') # export in openvino format
 ov_model = YOLO('newbest_openvino_model/') # load the exported openvino model
-
-cam = cv2.VideoCapture('imgtovid/output_video.mp4')
+path_to_mp4 = 'imgtovid/output_video.mp4'
+path_to_camera = 0
+cam = cv2.VideoCapture(path_to_camera)
 ret, frame = cam.read()
 
 while ret:
