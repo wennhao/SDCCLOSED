@@ -96,5 +96,12 @@ def run():
     else:
         print('[Error] Could not find device: {0}'.format(dev_path))
 
-if __name__ == '__main__':
+
+          
+
+def main():
     run()
+
+
+if __name__ == '__main__':
+    main()
