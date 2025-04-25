@@ -3,18 +3,18 @@ import cv2
 import numpy as np
 from roboflow import Roboflow
 
-detected_objects = [
-    {"class": "car", "count": 0},
-    {"class": "one-way-left", "count": 0},
-    {"class": "sign-left-only", "count": 0},
-    {"class": "speed-sign-20", "count": 0}, 
-    {"class": "speed-sign-30", "count": 0},
-    {"class": "stop-sign", "count": 0},
-    {"class": "traffic-light-green", "count": 0},
-    {"class": "traffic-light-red", "count": 0},
-    {"class": "traffic-light-off", "count": 0},
-    {"class": "zebra-crossing", "count": 0}
-]
+detected_objects = {
+    "car": 0,
+    "one-way-left": 0,
+    "sign-left-only": 0,
+    "speed-sign-20": 0, 
+    "speed-sign-30": 0,
+    "stop-sign": 0,
+    "traffic-light-green": 0,
+    "traffic-light-red": 0,
+    "traffic-light-off": 0,
+    "zebra-crossing": 0
+}
 
 frame_pool = 6
 frame_threshold = 3
@@ -25,9 +25,10 @@ model = YOLO('newbest.pt')
 model.export(format='openvino') # export in openvino format
 ov_model = YOLO('newbest_openvino_model/') # load the exported openvino model
 
+#path_to_video = 'imgtovid/output_video.mp4'
 path_to_camera = 0
 
-cam = cv2.VideoCapture(path_to_camera)
+cam = cv2.VideoCapture(path_to_video)
 ret, frame = cam.read()
 
 def execute(object_class):
@@ -60,8 +61,8 @@ while ret:
 
     if current_frame >= frame_pool:
         current_frame = 0
-        for obj in detected_objects:
-            obj["count"] = 0
+        for key in detected_objects:
+            detected_objects[key] = 0
 
     ### OBJECT DETECTION
     results = ov_model(frame)
@@ -73,19 +74,23 @@ while ret:
         conf = box.conf[0]
         if conf >= 0.5:
             # Check if label exists in detected_objects
-            for obj in detected_objects:
-                if obj["class"] == model.names[cls]:
-                    # If object has a valid class, add count
-                    obj["count"] += 1
-                    if obj["count"] >= frame_threshold:
-                        execute(obj["class"])
-                        obj["count"] = 0
-                    break
+            if model.names[cls] in detected_objects:
+                # If object has a valid class, add count
+                key = model.names[cls]
+                detected_objects[key] += 1
+                if detected_objects[key] >= frame_threshold:
+                    execute(key)
+                    detected_objects[key] = 0
 
-            # Display
-            label = f'{model.names[cls]} {conf:.2f}'
-            cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 255), 2)
-            cv2.putText(frame, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 2)
+                    # Display
+                    label = f'{key} {conf:.2f}'
+                    cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 50, 150), 3)
+                    cv2.putText(frame, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 50, 150), 3)
+                else:
+                    # Display
+                    label = f'{model.names[cls]} {conf:.2f}'
+                    cv2.rectangle(frame, (x1, y1), (x2, y2), (240, 50, 0), 2)
+                    cv2.putText(frame, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (240, 50, 0), 2)
 
     cv2.imshow('Camera', frame)
 
