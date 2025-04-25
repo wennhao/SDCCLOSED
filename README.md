@@ -55,3 +55,13 @@ Success! The dashboard is now running on [localhost]([localhost:](http://127.0.0
 ```
 deactivate
 ```
+
+
+
+## Running on the kart
+Change to the file you want to run, use python3 `file_name.py` to run the file on the kart
+
+> [!IMPORTANT]
+> Make sure your code is tested thoroughly!
+> Add a way to stop the kart with a button.
+
