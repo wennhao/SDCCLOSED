@@ -1,9 +1,5 @@
 # SDCCLOSED
 
-## We are
-
-### amazing
-
 ## Get Started
 This project requires Python, Flask, OpenCV and numpy to run
 
@@ -31,7 +27,7 @@ Create a new virtual environment
 python3.12 -m venv .venv
 ```
 ```
- Set-ExecutionPolicy Unrestricted -Scope Process
+Set-ExecutionPolicy Unrestricted -Scope Process
 ```
 On Windows
  ```
