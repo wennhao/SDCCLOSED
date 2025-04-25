@@ -1,0 +1,36 @@
+description: Ultralytics best model trained on C:\Users\Jordy\School\projact_f_w-4/data.yaml
+author: Ultralytics
+date: '2025-03-30T03:19:13.069673'
+version: 8.3.89
+license: AGPL-3.0 License (https://ultralytics.com/license)
+docs: https://docs.ultralytics.com
+stride: 32
+task: detect
+batch: 1
+imgsz:
+- 640
+- 640
+names:
+  0: '-'
+  1: '- annotate- and create datasets'
+  2: '- collaborate with your team on computer vision projects'
+  3: '- collect - organize images'
+  4: '- export- train- and deploy computer vision models'
+  5: '- understand and search unstructured image data'
+  6: '- use active learning to improve your dataset over time'
+  7: For state of the art Computer Vision training notebooks you can use with this
+    dataset-
+  8: Roboflow is an end-to-end computer vision platform that helps you
+  9: The dataset includes 4113 images.
+  10: The following pre-processing was applied to each image-
+  11: This dataset was exported via roboflow.com on August 7- 2024 at 5-19 PM GMT
+  12: To find over 100k other datasets and pre-trained models- visit https-universe.roboflow.com
+  13: Traffic-sign are annotated in YOLO v5 PyTorch format.
+  14: traffic sign - v5 2024-08-05 2-07pm
+  15: visit https-github.com-roboflow-notebooks
+args:
+  batch: 1
+  half: false
+  int8: false
+  dynamic: false
+  nms: false
