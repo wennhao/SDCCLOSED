@@ -73,7 +73,7 @@ def detect_lanes(frame):
         x_at_target = int(np.median(x_at_target_values))
         if x_at_target < x_norm - 25: # example values
             print("left")
-            return -0.4 # left
+            return (-0.4) # left
         elif x_at_target > x_norm + 25: # example values, maybe make them linear / exponential
             print("right")
             return 0.4 # right
@@ -115,7 +115,7 @@ def move_forward(bus, speed):
     return motor_task
  
 def steer(bus, angle):
-    if not (-1.25 <= angle <= 1.25):
+    if not (-1.25 < angle < 1.25):
         raise ValueError("Angle must be between -1.25 and 1.25")
    
     angle_bytes = struct.pack('<f', angle)  # < little-endian float f = float
@@ -138,6 +138,7 @@ def main():
     time_diff = 0
     try:
         while (time_diff < 30):
+
             _, frame = front_camera.read()
            
             move_forward(bus,25)
@@ -149,6 +150,8 @@ def main():
            
             end_time = time.time()
             time_diff = end_time - start_time
+
+            time.sleep(0.33)
            
     except KeyboardInterrupt:
         pass
