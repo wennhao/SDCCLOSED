@@ -111,7 +111,7 @@ def main():
     front_camera = initialize_camera()
     
     start_time = time.time()
-    
+    time_diff = 0
     try:
         while (time_diff < 20):
             _, frame = front_camera.read()
