@@ -113,11 +113,11 @@ def main():
     start_time = time.time()
     time_diff = 0
     try:
-        while (time_diff < 20):
+        while (time_diff < 30):
             _, frame = front_camera.read()
             
             steering = detect_lanes(frame)
-            steer_with_speed = (bus, steering, 2)
+            steer_with_speed = (bus, steering, 5)
             
             end_time = time.time()
             time_diff = end_time - start_time
