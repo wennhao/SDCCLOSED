@@ -1,5 +1,5 @@
 .venv/
 venv/
-
 __pycache__/
 cameratest/newbest_openvino_model/metadata.yaml
+*.mp4
