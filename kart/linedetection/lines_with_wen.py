@@ -140,7 +140,7 @@ def main():
         while (time_diff < 30):
             _, frame = front_camera.read()
            
-            move_forward(bus,5)
+            move_forward(bus,15)
             steering = detect_lanes(frame)
  
             steer(bus, steering)
