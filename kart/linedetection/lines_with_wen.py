@@ -110,15 +110,22 @@ def main():
 
     front_camera = initialize_camera()
     
+    start_time = time.time()
+    
     try:
-        while (True):
+        while (time_diff < 20):
             _, frame = front_camera.read()
             
             steering = detect_lanes(frame)
             steer_with_speed = (bus, steering, 2)
             
+            end_time = time.time()
+            time_diff = end_time - start_time
+            
     except KeyboardInterrupt:
         pass
+    
+    steer_with_speed = (bus, 0, 0)
     
     front_camera.release()
     cv2.destroyAllWindows()        
