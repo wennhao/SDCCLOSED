@@ -143,7 +143,7 @@ def main():
             move_forward(bus,5)
             steering = detect_lanes(frame)
  
-            steer(bus, steering, 2)
+            steer(bus, steering)
  
             # steer_with_speed = (bus, steering, 5)
            
