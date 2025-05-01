@@ -9,7 +9,7 @@ import struct
 CAN_MSG_SENDING_SPEED = .040 
 
 def initialize_camera():
-    capture = cv2.VideoCapture(2)
+    capture = cv2.VideoCapture(0)
     capture.set(cv2.CAP_PROP_FRAME_WIDTH, 848)
     capture.set(cv2.CAP_PROP_FRAME_HEIGHT,480)
     capture.set(cv2.CAP_PROP_AUTOFOCUS, 0)
