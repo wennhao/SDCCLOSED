@@ -67,19 +67,20 @@ def main(source: str, is_camera: bool = False):
     try:
         while True:
             ret, frame = cap.read()
+            small_frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
             if not ret:
                 break
 
             frame_count += 1
 
             # ---- Lane Detection ----
-            steering_cmd, lane_debug = process_frame(frame)
+            steering_cmd, lane_debug = process_frame(small_frame)
             combined_frame = lane_debug.copy()
 
             # ---- Object Detection ----
             # Object detection less frequently
             if frame_count % object_detection_interval == 0:
-                detections = detect_objects(frame)
+                detections = detect_objects(small_frame)
                 last_detections = detections
             else:
                 detections = last_detections
