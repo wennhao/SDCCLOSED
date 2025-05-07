@@ -1,14 +1,16 @@
-import can
+# import can
 from time import sleep
 import struct
 import sys
+import cv2
 # import steer as kart, brake as kart, motor as kart # this does not work
 # or i can do this
-import steer as SteerManager, brake as BrakeManager, motor as MotorManager
+# import steer as SteerManager, brake as BrakeManager, motor as MotorManager
+
 from statemachine.statemachine import MasterStateManager
 from linedetection.linedetection import process_frame
 from objectdetection.objectdetection import detect_objects
-import cv2
+
 
 # Variables
 angle_left = -1.25
@@ -61,7 +63,6 @@ def main(source: str, is_camera: bool = False):
 
             # ---- Lane Detection ----
             steering_cmd, lane_debug = process_frame(frame)
-
             combined_frame = lane_debug.copy()
 
             # ---- Object Detection ----
@@ -73,10 +74,18 @@ def main(source: str, is_camera: bool = False):
             else:
                 detection_label, confidence = None, 0.0
 
-            # Draw object detections on the same frame
-            detections = detect_objects(frame)
+            # Draw object detections
             for det in detections:
-                det.draw(combined_frame, color=(0,255,0))  # green boxes
+                if len(det) == 3:
+                    label, conf, bbox = det
+                    x1, y1, x2, y2 = map(int, bbox)
+                    cv2.rectangle(combined_frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                    cv2.putText(combined_frame, f"{label} {conf:.2f}", (x1, y1 - 10),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+                else:
+                    label, conf = det
+                    cv2.putText(combined_frame, f"{label} {conf:.2f}", (10, 30),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
 
 
             # ---- State Update ----
