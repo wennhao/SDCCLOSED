@@ -29,6 +29,8 @@ frame_count = 0
 object_detection_interval = 5
 last_detections = []
 
+frame_skip = 2
+
 # change the interface to virtual for testing
 # change the interface to socketcan and can0 for real testing
 def initialize_can():
@@ -67,11 +69,14 @@ def main(source: str, is_camera: bool = False):
     try:
         while True:
             ret, frame = cap.read()
-            small_frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
+            small_frame = cv2.resize(frame, (0, 0), fx=0.2, fy=0.2)
+
             if not ret:
                 break
 
             frame_count += 1
+            if frame_count % frame_skip != 0:
+                continue  # Skip this frame
 
             # ---- Lane Detection ----
             steering_cmd, lane_debug = process_frame(small_frame)
@@ -86,8 +91,9 @@ def main(source: str, is_camera: bool = False):
                 detections = last_detections
 
             # Detect zebra crossing
-            zebra = [(label, conf) for label, conf in detections if label == 'zebra-crossing']
+            zebra = [(label, conf) for label, conf, _ in detections if label == 'zebra-crossing']
             detection_label, confidence = zebra[0] if zebra else (None, 0.0)
+
 
             # Draw object detections
             for det in detections:
