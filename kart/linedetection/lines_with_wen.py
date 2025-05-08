@@ -126,7 +126,7 @@ def main():
             if not ret:
                 print("failed to read frame")
 
-            new_motor_message = move_forward(35)
+            new_motor_message = move_forward(50)
             motor_task.modify_data(new_motor_message)
 
             steering = detect_lanes(frame)
