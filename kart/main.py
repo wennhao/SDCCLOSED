@@ -1,14 +1,19 @@
-import can
+# import can
 from time import sleep
 import struct
 import sys
+import cv2
+import logging
 # import steer as kart, brake as kart, motor as kart # this does not work
 # or i can do this
-import steer as SteerManager, brake as BrakeManager, motor as MotorManager
+# import steer as SteerManager, brake as BrakeManager, motor as MotorManager
+
 from statemachine.statemachine import MasterStateManager
 from linedetection.linedetection import process_frame
 from objectdetection.objectdetection import detect_objects
-import cv2
+
+# Initialize logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s')
 
 # Variables
 angle_left = -1.25
@@ -19,6 +24,10 @@ min_speed = 0
 
 camera_path = 0
 
+# Frame processing variables
+frame_count = 0
+object_detection_interval = 5
+last_detections = []
 
 # change the interface to virtual for testing
 # change the interface to socketcan and can0 for real testing
@@ -53,37 +62,52 @@ def main(source: str, is_camera: bool = False):
         print(f"Error: Could not open {'camera' if is_camera else 'video file'}: {source}")
         return
 
+    global frame_count, last_detections
+
     try:
         while True:
             ret, frame = cap.read()
+            small_frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
             if not ret:
                 break
 
-            # ---- Lane Detection ----
-            steering_cmd, lane_debug = process_frame(frame)
+            frame_count += 1
 
+            # ---- Lane Detection ----
+            steering_cmd, lane_debug = process_frame(small_frame)
             combined_frame = lane_debug.copy()
 
             # ---- Object Detection ----
-            detections = detect_objects(frame)  # returns list of (label, confidence)
-            # Example: pick zebra crossing
-            zebra = [(label, conf) for label, conf in detections if label == 'zebra-crossing']
-            if zebra:
-                detection_label, confidence = zebra[0]
+            # Object detection less frequently
+            if frame_count % object_detection_interval == 0:
+                detections = detect_objects(small_frame)
+                last_detections = detections
             else:
-                detection_label, confidence = None, 0.0
+                detections = last_detections
 
-            # Draw object detections on the same frame
-            detections = detect_objects(frame)
+            # Detect zebra crossing
+            zebra = [(label, conf) for label, conf in detections if label == 'zebra-crossing']
+            detection_label, confidence = zebra[0] if zebra else (None, 0.0)
+
+            # Draw object detections
             for det in detections:
-                det.draw(combined_frame, color=(0,255,0))  # green boxes
+                if len(det) == 3:
+                    label, conf, bbox = det
+                    x1, y1, x2, y2 = map(int, bbox)
+                    cv2.rectangle(combined_frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                    cv2.putText(combined_frame, f"{label} {conf:.2f}", (x1, y1 - 10),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+                else:
+                    label, conf = det
+                    cv2.putText(combined_frame, f"{label} {conf:.2f}", (10, 30),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
 
 
             # ---- State Update ----
             state_info = state_manager.update_states(steering_cmd, detection_label, confidence)
             lane_state = state_info['lane_state']
             override = state_info.get('override', False)
-            print(f"Lane: {lane_state}, Override: {override}")
+            logging.info(f"Lane: {lane_state}, Override: {override}")
 
             # ---- Visualization ----
 
@@ -97,17 +121,17 @@ def main(source: str, is_camera: bool = False):
 
             # ---- Actions ----
             if override:
-                print("Action: BRAKE (zebra crossing)")
+                logging.warning("Action: BRAKE (zebra crossing)")
             else:
                 match lane_state:
                     case 'turning_left':
-                        print('Action: Steering Left')
+                        logging.info('Action: Steering Left')
                     case 'turning_right':
-                        print('Action: Steering Right')
+                        logging.info('Action: Steering Right')
                     case 'driving_straight':
-                        print('Action: Moving Forward')
+                        logging.info('Action: Moving Forward')
                     case _:
-                        print('Action: Searching for Lane')
+                        logging.info('Action: Searching for Lane')
 
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
