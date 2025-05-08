@@ -110,7 +110,7 @@ def main():
 
     front_camera = initialize_camera()
 
-    standard_speed = 65
+    standard_speed = 75
 
     start_time = time.time()
     time_diff = 0
