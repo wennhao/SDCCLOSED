@@ -93,7 +93,6 @@ def move_forward(speed):
         data=[speed, 0, 1, 0, 0, 0, 0, 0],
         is_extended_id=False
     )
-    # motor_message = [speed, 0, 1, 0, 0, 0, 0, 0]
     return motor_message
 
 def steer(angle):
@@ -107,8 +106,6 @@ def steer(angle):
         data = [*angle_bytes, 0, 0, 0, 0],
         is_extended_id = False
     )
-    # steer_message = [*angle_bytes, 0, 0, 0, 0]
-
     return steer_message
 
 
@@ -117,7 +114,7 @@ def main():
 
     front_camera = initialize_camera()
 
-    standard_speed = 100
+    standard_speed = 100 # 100 is te veel voor de CAN bus ..?
 
     start_time = time.time()
     time_diff = 0
@@ -134,6 +131,7 @@ def main():
             
             if not ret:
                 print("failed to read frame")
+                continue
 
             new_motor_message = move_forward(standard_speed)
             motor_task.modify_data(new_motor_message)
@@ -142,18 +140,12 @@ def main():
             if steering is None:
                 steering = 0.0
             steer_angle = steer(steering)
-            #steer_task.modify_data(steer_angle)
-            hardcode = steer(-0.65)
-            steer_task.modify_data(hardcode)
-
+            steer_task.modify_data(steer_angle)
 
             end_time = time.time()
             time_diff = end_time - start_time
 
             time.sleep(1)
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                print("Exit key pressed.")
-                break
 
     except KeyboardInterrupt:
         pass
@@ -170,14 +162,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-    
-"""
-Steer task aanmaken, elke iteratie vd loop de inhoud van die task aanpassen
-of
-Elke iteratie vd loop en task stoppen en een nieuwe aanmaken
-
-??
-hoef niet eens een message die herhaalt stuurt te maken
-kan gwn voor iedere iteratie 1 message sturen
-??
-"""
