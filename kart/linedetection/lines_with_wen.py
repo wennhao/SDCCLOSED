@@ -77,7 +77,7 @@ def detect_lanes(frame):
             return 0.4 # right
         else:
             print("straight")
-            return 0
+            return 0.0
 
 
 def move_forward(speed):
