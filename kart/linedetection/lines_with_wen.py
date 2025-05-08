@@ -121,7 +121,7 @@ def main():
         steer_message = steer(0.0)
         steer_task = bus.send_periodic(steer_message, CAN_MESSAGE_SENDING_SPEED)
 
-        while (time_diff < 120):
+        while (time_diff < 90):
 
             ret, frame = front_camera.read()
             
@@ -140,10 +140,10 @@ def main():
             end_time = time.time()
             time_diff = end_time - start_time
 
-            # time.sleep(0.33)
-            # if cv2.waitKey(1) & 0xFF == ord('q'):
-            #     print("Exit key pressed.")
-            #     break
+            time.sleep(0.10)
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                print("Exit key pressed.")
+                break
 
     except KeyboardInterrupt:
         pass
