@@ -90,8 +90,6 @@ def move_forward(speed):
     return motor_message
 
 def steer(angle):
-    if None:
-        return steer(0.0)
     if not (-1.25 < angle < 1.25):
         raise ValueError("Angle must be between -1.25 and 1.25")
 
@@ -130,6 +128,8 @@ def main():
                     print("failed to read frame")
 
                 steering = detect_lanes(frame)
+                if steering is None:
+                    steering = 0.0
                 steer_angle = steer(steering)
                 steer_task.modify_data(steer_angle)
 
@@ -148,8 +148,10 @@ def main():
         steer_task.stop()
 
     finally:
-        # motor_task.stop()
-        # steer_task.stop()
+        if motor_task:
+            motor_task.stop()
+        if steer_task:    
+            steer_task.stop()
         print("error / stopped")
 
     front_camera.release()
