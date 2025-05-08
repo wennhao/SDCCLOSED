@@ -143,7 +143,7 @@ def process_frameold(path):
 
         if cv2.waitKey(33) & 0xFF == ord('q'): # ongeveer 30 FPS
             break
-
+ 
     capture.release()
     cv2.destroyAllWindows()
 

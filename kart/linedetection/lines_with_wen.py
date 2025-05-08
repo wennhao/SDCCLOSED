@@ -55,12 +55,10 @@ def detect_lanes(frame):
 
     roi_border = width // 8 * 3
 
-    region_vertices = [(roi_border, 0), (width, 0), (width, height), (roi_border, height)] # rechterkant
+    region_vertices = [(roi_border, 0), (width, 0), (width, height), (roi_border, height)]
     roi = region_of_interest(edges, np.array([region_vertices], np.int32))
     lines = cv2.HoughLinesP(roi, 1, np.pi / 180, 50, np.array([]), minLineLength=50, maxLineGap=300)
-
-    x_at_target_values = []
-
+    
     x_at_target_values = []
 
     if lines is not None:
@@ -122,7 +120,10 @@ def main():
         try:
             while (time_diff < 30):
 
-                _, frame = front_camera.read()
+                ret, frame = front_camera.read()
+                
+                if not ret:
+                    print("failed to read frame")
 
                 steering = detect_lanes(frame)
                 steer_angle = steer(steering)
@@ -131,7 +132,7 @@ def main():
                 end_time = time.time()
                 time_diff = end_time - start_time
 
-                #time.sleep(0.33)
+                # time.sleep(0.33)
 
         except KeyboardInterrupt:
             pass
@@ -148,3 +149,14 @@ def main():
 
 if __name__ == '__main__':
     main()
+    
+"""
+Steer task aanmaken, elke iteratie vd loop de inhoud van die task aanpassen
+of
+Elke iteratie vd loop en task stoppen en een nieuwe aanmaken
+
+??
+hoef niet eens een message die herhaalt stuurt te maken
+kan gwn voor iedere iteratie 1 message sturen
+??
+"""
