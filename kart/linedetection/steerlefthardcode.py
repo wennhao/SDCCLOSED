@@ -49,9 +49,6 @@ def main():
         new_motor_message = move_forward(standard_speed)
         motor_task.modify_data(new_motor_message)
 
-        if steering is None:
-            steering = 0.0
-        steer_angle = steer(steering)
         #steer_task.modify_data(steer_angle)
         hardcode = steer(-0.65)
         steer_task.modify_data(hardcode)
