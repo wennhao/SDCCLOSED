@@ -69,7 +69,13 @@ def detect_lanes(frame):
 
     if x_at_target_values:
         x_at_target = int(np.median(x_at_target_values))
-        if x_at_target < x_norm - 25: # example values
+        if x_at_target < x_norm - 75: # example values
+            print("hard left")
+            return (-1.2) # left
+        elif x_at_target > x_norm + 75: # example values, maybe make them linear / exponential
+            print("hard right")
+            return 1.2 # right
+        elif x_at_target < x_norm - 25: # example values
             print("left")
             return (-0.65) # left
         elif x_at_target > x_norm + 25: # example values, maybe make them linear / exponential
@@ -140,7 +146,7 @@ def main():
             end_time = time.time()
             time_diff = end_time - start_time
 
-            time.sleep(0.50)
+            time.sleep(1)
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 print("Exit key pressed.")
                 break
