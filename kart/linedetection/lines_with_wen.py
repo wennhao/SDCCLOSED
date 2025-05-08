@@ -114,7 +114,7 @@ def main():
     time_diff = 0
     
     try:
-        motor_message = move_forward(35)
+        motor_message = move_forward(65)
         motor_task = bus.send_periodic(motor_message, CAN_MESSAGE_SENDING_SPEED)
         steer_message = steer(0.0)
         steer_task = bus.send_periodic(steer_message, CAN_MESSAGE_SENDING_SPEED)
