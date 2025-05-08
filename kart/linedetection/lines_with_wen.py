@@ -129,7 +129,7 @@ def main():
 
                 steering = detect_lanes(frame)
                 steer_angle = steer(steering)
-                steer_message.modify_data(steer_angle)
+                steer_task.modify_data(steer_angle)
 
                 end_time = time.time()
                 time_diff = end_time - start_time
