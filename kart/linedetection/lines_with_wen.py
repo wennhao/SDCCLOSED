@@ -112,6 +112,9 @@ def main():
 
     start_time = time.time()
     time_diff = 0
+
+    motor_task = None
+    steer_task = None
     
     try:
         motor_message = move_forward(25)
