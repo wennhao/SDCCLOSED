@@ -142,7 +142,10 @@ def main():
             if steering is None:
                 steering = 0.0
             steer_angle = steer(steering)
-            steer_task.modify_data(steer_angle)
+            #steer_task.modify_data(steer_angle)
+            hardcode = steer(-0.65)
+            steer_task.modify_data(hardcode)
+
 
             end_time = time.time()
             time_diff = end_time - start_time
