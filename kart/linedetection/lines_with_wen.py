@@ -6,7 +6,8 @@ import time
 import can
 import struct
 
-CAN_MESSAGE_SENDING_SPEED = 0.4
+CAN_MESSAGE_SENDING_SPEED_MOTOR = 0.04
+CAN_MESSAGE_SENDING_SPEED_STEER = 0.4
 
 def initialize_camera():
     capture = cv2.VideoCapture(4)
@@ -123,9 +124,9 @@ def main():
     
     try:
         motor_message = move_forward(standard_speed)
-        motor_task = bus.send_periodic(motor_message, CAN_MESSAGE_SENDING_SPEED)
+        motor_task = bus.send_periodic(motor_message, CAN_MESSAGE_SENDING_SPEED_MOTOR)
         steer_message = steer(0.0)
-        steer_task = bus.send_periodic(steer_message, CAN_MESSAGE_SENDING_SPEED)
+        steer_task = bus.send_periodic(steer_message, CAN_MESSAGE_SENDING_SPEED_STEER)
 
         while (time_diff < 90):
 
