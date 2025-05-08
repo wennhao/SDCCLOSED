@@ -81,11 +81,12 @@ def detect_lanes(frame):
 
 
 def move_forward(speed):
-    motor_message = can.Message(
-        arbitration_id=0x330,
-        data=[speed, 0, 1, 0, 0, 0, 0, 0],
-        is_extended_id=False
-    )
+    # motor_message = can.Message(
+    #     arbitration_id=0x330,
+    #     data=[speed, 0, 1, 0, 0, 0, 0, 0],
+    #     is_extended_id=False
+    # )
+    motor_message = [speed, 0, 1, 0, 0, 0, 0, 0]
     return motor_message
 
 def steer(angle):
@@ -94,11 +95,12 @@ def steer(angle):
 
     angle_bytes = struct.pack('<f', angle)  # < little-endian float f = float
 
-    steer_message = can.Message(
-        arbitration_id = 0x220,
-        data = [*angle_bytes, 0, 0, 0, 0],
-        is_extended_id = False
-    )
+    # steer_message = can.Message(
+    #     arbitration_id = 0x220,
+    #     data = [*angle_bytes, 0, 0, 0, 0],
+    #     is_extended_id = False
+    # )
+    steer_message = [*angle_bytes, 0, 0, 0, 0]
 
     return steer_message
 
