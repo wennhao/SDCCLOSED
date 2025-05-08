@@ -6,7 +6,7 @@ import time
 import can
 import struct
 
-CAN_MESSAGE_SENDING_SPEED = 0.04
+CAN_MESSAGE_SENDING_SPEED = 0.4
 
 def initialize_camera():
     capture = cv2.VideoCapture(4)
