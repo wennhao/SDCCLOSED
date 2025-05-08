@@ -39,19 +39,20 @@ def main():
     bus = initialize_can()
     standard_speed = 100
     try:
-        motor_message = move_forward(standard_speed)
-        motor_task = bus.send_periodic(motor_message, CAN_MESSAGE_SENDING_SPEED_MOTOR)
-        steer_message = steer(0.0)
-        steer_task = bus.send_periodic(steer_message, CAN_MESSAGE_SENDING_SPEED_STEER)
+        while:
+            motor_message = move_forward(standard_speed)
+            motor_task = bus.send_periodic(motor_message, CAN_MESSAGE_SENDING_SPEED_MOTOR)
+            steer_message = steer(0.0)
+            steer_task = bus.send_periodic(steer_message, CAN_MESSAGE_SENDING_SPEED_STEER)
 
 
 
-        new_motor_message = move_forward(standard_speed)
-        motor_task.modify_data(new_motor_message)
+            new_motor_message = move_forward(standard_speed)
+            motor_task.modify_data(new_motor_message)
 
-        #steer_task.modify_data(steer_angle)
-        hardcode = steer(-0.65)
-        steer_task.modify_data(hardcode)
+            #steer_task.modify_data(steer_angle)
+            hardcode = steer(-0.65)
+            steer_task.modify_data(hardcode)
 
 
     except KeyboardInterrupt:
