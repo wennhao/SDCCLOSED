@@ -140,7 +140,7 @@ def main():
             end_time = time.time()
             time_diff = end_time - start_time
 
-            time.sleep(0.10)
+            time.sleep(0.50)
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 print("Exit key pressed.")
                 break
