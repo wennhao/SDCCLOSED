@@ -71,10 +71,10 @@ def detect_lanes(frame):
         x_at_target = int(np.median(x_at_target_values))
         if x_at_target < x_norm - 25: # example values
             print("left")
-            return (-0.4) # left
+            return (-0.65) # left
         elif x_at_target > x_norm + 25: # example values, maybe make them linear / exponential
             print("right")
-            return 0.4 # right
+            return 0.65 # right
         else:
             print("straight")
             return 0.0
