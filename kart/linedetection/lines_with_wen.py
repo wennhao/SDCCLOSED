@@ -6,10 +6,11 @@ import time
 import can
 import struct
 
-CAN_MESSAGE_SENDING_SPEED = 0.04
+CAN_MESSAGE_SENDING_SPEED_MOTOR = 0.04
+CAN_MESSAGE_SENDING_SPEED_STEER = 0.4
 
 def initialize_camera():
-    capture = cv2.VideoCapture(2)
+    capture = cv2.VideoCapture(4)
     capture.set(cv2.CAP_PROP_FRAME_WIDTH, 848)
     capture.set(cv2.CAP_PROP_FRAME_HEIGHT,480)
     capture.set(cv2.CAP_PROP_AUTOFOCUS, 0)
@@ -69,15 +70,21 @@ def detect_lanes(frame):
 
     if x_at_target_values:
         x_at_target = int(np.median(x_at_target_values))
-        if x_at_target < x_norm - 25: # example values
+        if x_at_target < x_norm - 75: # example values
+            print("hard left")
+            return (-1.2) # left
+        elif x_at_target > x_norm + 75: # example values, maybe make them linear / exponential
+            print("hard right")
+            return 1.2 # right
+        elif x_at_target < x_norm - 25: # example values
             print("left")
-            return (-0.4) # left
+            return (-0.65) # left
         elif x_at_target > x_norm + 25: # example values, maybe make them linear / exponential
             print("right")
-            return 0.4 # right
+            return 0.65 # right
         else:
             print("straight")
-            return 0
+            return 0.0
 
 
 def move_forward(speed):
@@ -86,6 +93,7 @@ def move_forward(speed):
         data=[speed, 0, 1, 0, 0, 0, 0, 0],
         is_extended_id=False
     )
+    # motor_message = [speed, 0, 1, 0, 0, 0, 0, 0]
     return motor_message
 
 def steer(angle):
@@ -99,6 +107,7 @@ def steer(angle):
         data = [*angle_bytes, 0, 0, 0, 0],
         is_extended_id = False
     )
+    # steer_message = [*angle_bytes, 0, 0, 0, 0]
 
     return steer_message
 
@@ -108,44 +117,53 @@ def main():
 
     front_camera = initialize_camera()
 
+    standard_speed = 100
+
     start_time = time.time()
     time_diff = 0
     
     try:
-        motor_message = move_forward(bus, 25)
-        motor_task = bus.send_periodic(motor_message, CAN_MESSAGE_SENDING_SPEED)
-        steer_message = steer(0)
-        steer_task = bus.send_periodic(steer_message, CAN_MESSAGE_SENDING_SPEED)
+        motor_message = move_forward(standard_speed)
+        motor_task = bus.send_periodic(motor_message, CAN_MESSAGE_SENDING_SPEED_MOTOR)
+        steer_message = steer(0.0)
+        steer_task = bus.send_periodic(steer_message, CAN_MESSAGE_SENDING_SPEED_STEER)
 
-        try:
-            while (time_diff < 30):
+        while (time_diff < 90):
 
-                ret, frame = front_camera.read()
-                
-                if not ret:
-                    print("failed to read frame")
+            ret, frame = front_camera.read()
+            
+            if not ret:
+                print("failed to read frame")
 
-                steering = detect_lanes(frame)
-                steer_angle = steer(steering)
-                steer_message.modify_data(steer_angle)
+            new_motor_message = move_forward(standard_speed)
+            motor_task.modify_data(new_motor_message)
 
-                end_time = time.time()
-                time_diff = end_time - start_time
+            steering = detect_lanes(frame)
+            if steering is None:
+                steering = 0.0
+            steer_angle = steer(steering)
+            #steer_task.modify_data(steer_angle)
+            hardcode = steer(-0.65)
+            steer_task.modify_data(hardcode)
 
-                time.sleep(0.33)
-                if cv2.waitKey(1) & 0xFF == ord('q'):
-                    print("Exit key pressed.")
-                    break
 
-        except KeyboardInterrupt:
-            pass
+            end_time = time.time()
+            time_diff = end_time - start_time
 
-        motor_task.stop()
-        steer_task.stop()
+            time.sleep(1)
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                print("Exit key pressed.")
+                break
+
+    except KeyboardInterrupt:
+        pass
 
     finally:
-        motor_task.stop()
-        steer_task.stop()
+        if motor_task:
+            motor_task.stop()
+        if steer_task:    
+            steer_task.stop()
+        print("error / stopped")    
 
     front_camera.release()
     cv2.destroyAllWindows()        
