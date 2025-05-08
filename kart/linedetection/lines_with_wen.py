@@ -90,6 +90,8 @@ def move_forward(speed):
     return motor_message
 
 def steer(angle):
+    if None:
+        return steer(0.0)
     if not (-1.25 < angle < 1.25):
         raise ValueError("Angle must be between -1.25 and 1.25")
 
