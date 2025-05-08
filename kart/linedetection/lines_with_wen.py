@@ -110,11 +110,13 @@ def main():
 
     front_camera = initialize_camera()
 
+    standard_speed = 65
+
     start_time = time.time()
     time_diff = 0
     
     try:
-        motor_message = move_forward(65)
+        motor_message = move_forward(standard_speed)
         motor_task = bus.send_periodic(motor_message, CAN_MESSAGE_SENDING_SPEED)
         steer_message = steer(0.0)
         steer_task = bus.send_periodic(steer_message, CAN_MESSAGE_SENDING_SPEED)
@@ -126,7 +128,7 @@ def main():
             if not ret:
                 print("failed to read frame")
 
-            new_motor_message = move_forward(50)
+            new_motor_message = move_forward(standard_speed)
             motor_task.modify_data(new_motor_message)
 
             steering = detect_lanes(frame)
