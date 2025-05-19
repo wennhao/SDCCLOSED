@@ -87,7 +87,7 @@ def detect_lanes(frame):
             return 0.0
 
 
-def move_forward(speed):
+def forward_message(speed):
     motor_message = can.Message(
         arbitration_id=0x330,
         data=[speed, 0, 1, 0, 0, 0, 0, 0],
@@ -120,7 +120,7 @@ def main():
     time_diff = 0
     
     try:
-        motor_message = move_forward(standard_speed)
+        motor_message = forward_message(standard_speed)
         motor_task = bus.send_periodic(motor_message, CAN_MESSAGE_SENDING_SPEED_MOTOR)
         steer_message = steer(0.0)
         steer_task = bus.send_periodic(steer_message, CAN_MESSAGE_SENDING_SPEED_STEER)
@@ -133,7 +133,7 @@ def main():
                 print("failed to read frame")
                 continue
 
-            new_motor_message = move_forward(standard_speed)
+            new_motor_message = forward_message(standard_speed)
             motor_task.modify_data(new_motor_message)
 
             steering = detect_lanes(frame)
