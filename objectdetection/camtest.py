@@ -91,7 +91,6 @@ while ret:
                     label = f'{model.names[cls]} {conf:.2f}'
                     cv2.rectangle(frame, (x1, y1), (x2, y2), (240, 50, 0), 2)
                     cv2.putText(frame, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (240, 50, 0), 2)
-
     cv2.imshow('Camera', frame)
 
     current_frame += 1
