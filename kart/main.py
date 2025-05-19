@@ -13,7 +13,8 @@ import can
 
 from statemachine.statemachine import MasterStateManager, LaneState, TrafficLightState
 from linedetection.linedetection import process_frame
-from objectdetection.objectdetection import detect_objects
+#from objectdetection.objectdetection import detect_objects
+from objectdetection.objecttest import detect_objects
 
 # Initialize logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s')
@@ -79,11 +80,12 @@ def main(source: str, is_camera: bool = False):
         return
 
     global frame_count, last_detections
+    size_scale = 0.2
 
     try:
         while True:
             ret, frame = cap.read()
-            small_frame = cv2.resize(frame, (0, 0), fx=0.2, fy=0.2)
+            small_frame = cv2.resize(frame, (0, 0), fx=size_scale, fy=size_scale)
 
             if not ret:
                 break
@@ -104,12 +106,6 @@ def main(source: str, is_camera: bool = False):
             else:
                 combined_frame = small_frame.copy()
 
-            # ---- Display Debug Information ----        
-            if SHOW_VIDEO:
-                cv2.imshow("Combined View", combined_frame)
-                if cv2.waitKey(1) & 0xFF == ord('q'):
-                    break
-
             # ---- Object Detection ----
             # Object detection less frequently
             # ---- Object Detection (Skipped for Testing) ----
@@ -117,14 +113,17 @@ def main(source: str, is_camera: bool = False):
             detections = []
 
             if not DISABLE_OBJECT_DETECTION and frame_count % object_detection_interval == 0:
-                detections = detect_objects(small_frame)
+                detections = detect_objects(small_frame, size_scale)
+                for (detection, label, (x1, y1), (x2, y2)) in detections:
+                    logging.info(f"OBJECT: {detection}")
+                    cv2.rectangle(combined_frame, (x1, y1), (x2, y2), (0, 50, 150), 2)
+                    cv2.putText(combined_frame, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 50, 150), 2)
 
-                # Extract traffic light detections
-                traffic = [(lbl, c, col) for lbl, c, _, col in detections if lbl == "traffic_light"]
-                if traffic:
-                    detection_label, confidence, detection_color = max(traffic, key=lambda x: x[1])
-                    logging.info(f"Detected {detection_label} with confidence {confidence} and color {detection_color}")
-
+            # ---- Display Debug Information ----        
+            if SHOW_VIDEO:
+                cv2.imshow("Combined View", combined_frame)
+                if cv2.waitKey(1) & 0xFF == ord('q'):
+                    break
 
             # ---- State Update ----
             state_info = state_manager.update_states(

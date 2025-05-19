@@ -1,44 +1,91 @@
 from ultralytics import YOLO
 import cv2
 import numpy as np
-from roboflow import Roboflow
 
-model = YOLO('newbest.pt')
+detected_objects = {
+    "car": 0,
+    "one-way-left": 0,
+    "sign-left-only": 0,
+    "speed-sign-20": 0, 
+    "speed-sign-30": 0,
+    "stop-sign": 0,
+    "traffic-light-green": 0,
+    "traffic-light-red": 0,
+    "traffic-light-off": 0,
+    "zebra-crossing": 0,
+    "person": 0
+}
+objects_size = {
+    "car": 8000,
+    "one-way-left": 1200,
+    "sign-left-only": 1200,
+    "speed-sign-20": 1500, 
+    "speed-sign-30": 1000,
+    "stop-sign": 2000,
+    "traffic-light-green": 1000,
+    "traffic-light-red": 1000,
+    "traffic-light-off": 1000,
+    "zebra-crossing": 8000,
+    "person": 8000
+}
 
-model.export(format='openvino') # export in openvino format
-ov_model = YOLO('newbest_openvino_model/') # load the exported openvino model
+frame_pool = 10
+frame_threshold = 1
+current_frame = 0
 
-path_to_camera = 0
+# model = YOLO('withman.pt')
 
-cam = cv2.VideoCapture(path_to_camera)
-ret, frame = cam.read()
+# model.export(format='openvino') # export in openvino format
+ov_model = YOLO('objectdetection/withman_openvino_model/') # load the exported openvino model
 
-while ret:
-    ret, frame = cam.read()
-    if not ret:
-        break
+# path_to_video = 'imgtovid/recording 03-04-2025 15-51-02/output_video.mp4'
+# path_to_camera = 0
+
+# cam = cv2.VideoCapture(path_to_video)
+
+def detect_objects(frame, scale):
+    try:
+        current_frame
+    except NameError:
+        current_frame = 0
+
+    if current_frame >= frame_pool:
+        current_frame = 0
+        for key in detected_objects:
+            detected_objects[key] = 0
 
     ### OBJECT DETECTION
     results = ov_model(frame)
     boxes = results[0].boxes
+    detections = []
 
     for box in boxes:
         cls = int(box.cls[0])
         x1, y1, x2, y2 = map(int, box.xyxy[0])
         conf = box.conf[0]
         if conf >= 0.5:
-            # Check objects and execute
-            
-
-            # Display
-            label = f'{model.names[cls]} {conf:.2f}'
-            cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 255), 2)
-            cv2.putText(frame, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 2)
-
-    cv2.imshow('Camera', frame)
-
-    if cv2.waitKey(1) == ord('q'):
-        break
+            # Check if label exists in detected_objects
+            if ov_model.names[cls] in detected_objects:
+                # If object has a valid class, add count
+                key = ov_model.names[cls]
+                detected_objects[key] += 1
+                if detected_objects[key] >= frame_threshold and (abs(x1-x2)*abs(y1-y2)) >= (objects_size[key]*scale):
+                    detected_objects[key] = 0
+                    label = f'{key} {conf:.2f}'
+                    detections.append((key, label, (x1, y1), (x2, y2)))
+                    # Display
+                    # label = f'{key} {conf:.2f}'
+                    # cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 50, 150), 3)
+                    # cv2.putText(frame, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 50, 150), 3)
+                # else:
+                    # Display
+                    # label = f'{ov_model.names[cls]} {conf:.2f}'
+                #     cv2.rectangle(frame, (x1, y1), (x2, y2), (240, 50, 0), 2)
+                #     cv2.putText(frame, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (240, 50, 0), 2)
+                # cv2.putText(frame, str(abs(x1-x2)*abs(y1-y2)), (x1+50, y1+50), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (230, 0, 250), 2)
+                current_frame += 1
+    # cv2.imshow('Camera', frame)
+    return detections
 
 '''
 classes:
@@ -51,7 +98,7 @@ speed-sign-30
 stop-sign
 traffic-light-green
 traffic-light-red
-traffic-light-off
+traffic-light-off (niet gebruikt)
 zebra-crossing
 person
 '''

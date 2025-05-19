@@ -29,7 +29,7 @@ def detect_objects(frame):
 
 
     detections = []
-    for box in results[0].boxes:
+    for box in boxes:
         cls     = int(box.cls[0])
         name    = results[0].names[cls]        # e.g. "traffic-light-red"
         conf    = float(box.conf[0])
