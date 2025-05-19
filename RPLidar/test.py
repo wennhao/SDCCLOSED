@@ -40,11 +40,12 @@ def update_line(num, iterator, line):
                 detected_front = True
         # Define "front left" as measurements with angle between 15° and 90°.
         elif 15 < angle < 90:
-            detected_left = True
+            if distance < FRONT_THRESHOLD_MM:           
+                detected_right = True
         # Define "front right" as measurements with angle between 270° and 345°.
         elif 270 < angle < 345:
             if distance < FRONT_THRESHOLD_MM:
-                detected_right = True
+                detected_left = True
 
 
 
