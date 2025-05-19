@@ -51,6 +51,7 @@ speed-sign-30
 stop-sign
 traffic-light-green
 traffic-light-red
-traffic-light-off (niet gebruikt)
+traffic-light-off
 zebra-crossing
+person
 '''
