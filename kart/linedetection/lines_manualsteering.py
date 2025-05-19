@@ -84,7 +84,7 @@ def detect_lanes(frame):
             return 0.0
 
 
-def move_forward(speed):
+def forward_message(speed):
     motor_message = can.Message(
         arbitration_id=0x330,
         data=[speed, 0, 1, 0, 0, 0, 0, 0],
@@ -92,7 +92,7 @@ def move_forward(speed):
     )
     return motor_message
 
-def steer(angle):
+def steer_message(angle):
     if not (-1.25 < angle < 1.25):
         raise ValueError("Angle must be between -1.25 and 1.25")
 
@@ -126,13 +126,13 @@ def main():
                 print("Failed to read frame")
                 continue
             
-            new_motor_message = move_forward(standard_speed)
+            new_motor_message = forward_message(standard_speed)
             bus.send(new_motor_message)
 
             steering = detect_lanes(frame)
             if steering is None:
                 steering = 0.0
-            new_steer_message = steer(steering)
+            new_steer_message = steer_message(steering)
             bus.send(new_steer_message)
 
             end_time = time.time()
@@ -144,8 +144,8 @@ def main():
         pass
 
     finally:
-        bus.send(move_forward(0))
-        bus.send(steer(0.0))
+        bus.send(forward_message(0))
+        bus.send(steer_message(0.0))
         brake_message = can.Message(arbitration_id=0x110, data=[0, 0, 0, 0, 0, 0, 0, 0], is_extended_id=False)
         bus.send(brake_message)
         print("Process stopped")
