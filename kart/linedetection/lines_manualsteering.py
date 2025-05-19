@@ -67,10 +67,10 @@ def detect_lanes(frame):
 
     if x_at_target_values:
         x_at_target = int(np.median(x_at_target_values))
-        if x_at_target < x_norm - 75: # example values
+        if x_at_target < x_norm - 100: # example values
             print("hard left")
             return (-1.2) # left
-        elif x_at_target > x_norm + 75: # example values, maybe make them linear / exponential
+        elif x_at_target > x_norm + 100: # example values, maybe make them linear / exponential
             print("hard right")
             return 1.2 # right
         elif x_at_target < x_norm - 25: # example values
@@ -146,7 +146,9 @@ def main():
     finally:
         bus.send(move_forward(0))
         bus.send(steer(0.0))
-        print("Process stopped")    
+        brake_message = can.Message(arbitration_id=0x110, data=[0, 0, 0, 0, 0, 0, 0, 0], is_extended_id=False)
+        bus.send(brake_message)
+        print("Process stopped")
 
     front_camera.release()
     cv2.destroyAllWindows()        
