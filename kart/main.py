@@ -1,21 +1,28 @@
 # import can
 from time import sleep
+from motor import forward_message
+from steer import steer_message
 import struct
 import sys
 import cv2
 import logging
+import can
 # import steer as kart, brake as kart, motor as kart # this does not work
 # or i can do this
 # import steer as SteerManager, brake as BrakeManager, motor as MotorManager
 
-from statemachine.statemachine import MasterStateManager
+from statemachine.statemachine import MasterStateManager, LaneState, TrafficLightState
 from linedetection.linedetection import process_frame
 from objectdetection.objectdetection import detect_objects
 
 # Initialize logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s')
 
-# Variables
+DEBUG_MODE = True
+SHOW_VIDEO = True
+DISABLE_OBJECT_DETECTION = False
+DISABLE_LANE_DETECTION = True
+
 angle_left = -1.25
 angle_center = 0.0
 angle_right = 1.25
@@ -29,12 +36,18 @@ frame_count = 0
 object_detection_interval = 5
 last_detections = []
 
-frame_skip = 2
+frame_skip = 10
+
 
 # change the interface to virtual for testing
 # change the interface to socketcan and can0 for real testing
 def initialize_can():
-    bus = can.Bus(interface='virtual', channel='vcan0', bitrate=500000, receive_own_messages=True)
+    if DEBUG_MODE:
+        # Virtual CAN for simulation/testing
+        bus = can.Bus(interface='virtual', channel='vcan0', bitrate=500000, receive_own_messages=True)
+    else:
+        # Real CAN for kart control
+        bus = can.Bus(interface='socketcan', channel='can0', bitrate=500000)
     return bus
 
 def send_test_message(bus):
@@ -53,6 +66,7 @@ def main(source: str, is_camera: bool = False):
     """
     # Initialize state manager
     state_manager = MasterStateManager()
+    bus = initialize_can()
 
     # Initialize capture (camera or video file)
     if is_camera:
@@ -78,72 +92,104 @@ def main(source: str, is_camera: bool = False):
             if frame_count % frame_skip != 0:
                 continue  # Skip this frame
 
+            
+
+
             # ---- Lane Detection ----
-            steering_cmd, lane_debug = process_frame(small_frame)
-            combined_frame = lane_debug.copy()
+            steering_cmd, lane_debug = None, None
+
+            if not DISABLE_LANE_DETECTION:
+                steering_cmd, lane_debug = process_frame(small_frame)
+                combined_frame = lane_debug.copy()
+            else:
+                combined_frame = small_frame.copy()
+
+            # ---- Display Debug Information ----        
+            if SHOW_VIDEO:
+                cv2.imshow("Combined View", combined_frame)
+                if cv2.waitKey(1) & 0xFF == ord('q'):
+                    break
 
             # ---- Object Detection ----
             # Object detection less frequently
-            if frame_count % object_detection_interval == 0:
+            # ---- Object Detection (Skipped for Testing) ----
+            detection_label, confidence, detection_color = None, 0.0, None
+            detections = []
+
+            if not DISABLE_OBJECT_DETECTION and frame_count % object_detection_interval == 0:
                 detections = detect_objects(small_frame)
-                last_detections = detections
-            else:
-                detections = last_detections
 
-            # Detect zebra crossing
-            zebra = [(label, conf) for label, conf, _ in detections if label == 'zebra-crossing']
-            detection_label, confidence = zebra[0] if zebra else (None, 0.0)
-
-
-            # Draw object detections
-            for det in detections:
-                if len(det) == 3:
-                    label, conf, bbox = det
-                    x1, y1, x2, y2 = map(int, bbox)
-                    cv2.rectangle(combined_frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
-                    cv2.putText(combined_frame, f"{label} {conf:.2f}", (x1, y1 - 10),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
-                else:
-                    label, conf = det
-                    cv2.putText(combined_frame, f"{label} {conf:.2f}", (10, 30),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
+                # Extract traffic light detections
+                traffic = [(lbl, c, col) for lbl, c, _, col in detections if lbl == "traffic_light"]
+                if traffic:
+                    detection_label, confidence, detection_color = max(traffic, key=lambda x: x[1])
+                    logging.info(f"Detected {detection_label} with confidence {confidence} and color {detection_color}")
 
 
             # ---- State Update ----
-            state_info = state_manager.update_states(steering_cmd, detection_label, confidence)
+            state_info = state_manager.update_states(
+                steering_cmd, 
+                detection_label, 
+                confidence,
+                detection_color
+            )
             lane_state = state_info['lane_state']
-            override = state_info.get('override', False)
+            traffic_state = state_info['traffic_state']
+            override = state_info['override']
+
             logging.info(f"Lane: {lane_state}, Override: {override}")
 
-            # ---- Visualization ----
 
-            cv2.imshow("Combined View", combined_frame)
-
-            # overlay lane_debug and detection boxes
-            # cv2.imshow('Lane', lane_debug)
-            # # You can also draw detections on frame and show:
-            # # for label, conf in detections: ... cv2.rectangle, putText, etc.
-            # cv2.imshow('Frame', frame)
-
-            # ---- Actions ----
+            # ---- Actions / CAN messages ----
             if override:
-                logging.warning("Action: BRAKE (zebra crossing)")
+                logging.warning("BRAKE: zebra crossing")
+                if not DEBUG_MODE:
+                    bus.send(forward_message(0))
             else:
-                match lane_state:
-                    case 'turning_left':
-                        logging.info('Action: Steering Left')
-                    case 'turning_right':
-                        logging.info('Action: Steering Right')
-                    case 'driving_straight':
-                        logging.info('Action: Moving Forward')
-                    case _:
-                        logging.info('Action: Searching for Lane')
+                match traffic_state:
+                    case TrafficLightState.RED:
+                        logging.warning("RED light → brake")
+                        if not DEBUG_MODE:
+                            bus.send(forward_message(0))
 
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
+                    case TrafficLightState.GREEN:
+                        logging.info("GREEN light → go")
+                        if not DEBUG_MODE:
+                            bus.send(steer_message(angle_center))
+                            bus.send(forward_message(60))
+
+                    case _:
+                        # No active traffic light: fall back to lane state
+                        match lane_state:
+                            case LaneState.LEFT:
+                                logging.info("Steer Left")
+                                if not DEBUG_MODE:
+                                    bus.send(steer_message(angle_left))
+                                    bus.send(forward_message(30))
+
+                            case LaneState.RIGHT:
+                                logging.info("Steer Right")
+                                if not DEBUG_MODE:
+                                    bus.send(steer_message(angle_right))
+                                    bus.send(forward_message(30))
+
+                            case LaneState.STRAIGHT:
+                                logging.info("Go Straight")
+                                if not DEBUG_MODE:
+                                    bus.send(steer_message(angle_center))
+                                    bus.send(forward_message(60))
+
+                            case _:
+                                logging.info("Searching for Lane")
+                                if not DEBUG_MODE:
+                                    bus.send(steer_message(angle_center))
+                                    bus.send(forward_message(0))
+
+
     finally:
         cap.release()
         cv2.destroyAllWindows()
+        bus.shutdown()
 
 
 if __name__ == '__main__':

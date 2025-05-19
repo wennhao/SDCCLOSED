@@ -1,4 +1,16 @@
-# statemachine.py
+from enum import Enum, auto
+
+class LaneState(Enum):
+    SEARCHING = auto()
+    STRAIGHT = auto()
+    LEFT = auto()
+    RIGHT = auto()
+
+
+class TrafficLightState(Enum):
+    NONE      = auto()
+    RED       = auto()
+    GREEN     = auto()
 
 class LaneFollowingState:
     """
@@ -7,7 +19,7 @@ class LaneFollowingState:
 
     def __init__(self):
         # Possible states: searching_lane, driving_straight, turning_left, turning_right
-        self.state = "searching_lane"
+        self.state = LaneState.SEARCHING
 
     def update(self, steering_command: str) -> str:
         """
@@ -15,14 +27,15 @@ class LaneFollowingState:
         """
         match steering_command:
             case "turning_left":
-                self.state = "turning_left"
+                self.state = LaneState.LEFT
             case "turning_right":
-                self.state = "turning_right"
+                self.state = LaneState.RIGHT
             case "driving_straight":
-                self.state = "driving_straight"
+                self.state = LaneState.STRAIGHT
             case _:
-                self.state = "searching_lane"
+                self.state = LaneState.SEARCHING
         return self.state
+
 
 
 class MasterStateManager:
@@ -32,9 +45,14 @@ class MasterStateManager:
 
     def __init__(self):
         self.lane_state = LaneFollowingState()
+        self.traffic = TrafficLightState.NONE
         self.override = False
 
-    def update_states(self, steering_cmd: str, detection_label: str = None, confidence: float = 0.0) -> dict:
+    def update_states(self, 
+                    steering_cmd: str, 
+                    detection_label: str = None, 
+                    confidence: float = 0.0, 
+                    traffic_color: str = None) -> dict:
         """
         Updates the lane state and applies override logic based on object detection.
 
@@ -51,6 +69,16 @@ class MasterStateManager:
         # Update lane state
         lane_state = self.lane_state.update(steering_cmd)
 
+        # Traffic light logic
+        if detection_label == 'traffic_light' and confidence > 0.6:
+            match traffic_color:
+                case 'red':
+                    self.traffic = TrafficLightState.RED
+                case 'green':
+                    self.traffic = TrafficLightState.GREEN
+                case _:
+                    self.traffic = TrafficLightState.NONE
+
         # Override logic: stop at zebra crossings
         if detection_label == 'zebra-crossing' and confidence > 0.6:
             self.override = True
@@ -59,5 +87,6 @@ class MasterStateManager:
 
         return {
             'lane_state': lane_state,
+            'traffic_state': self.traffic,
             'override': self.override
         }
