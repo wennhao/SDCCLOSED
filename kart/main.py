@@ -20,8 +20,8 @@ from objectdetection.objecttest import detect_objects
 logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s')
 
 DEBUG_MODE = True
-SHOW_VIDEO = False
-DISABLE_OBJECT_DETECTION = True
+SHOW_VIDEO = True
+DISABLE_OBJECT_DETECTION = False
 DISABLE_LANE_DETECTION = False
 LOG_MODE = True
 
@@ -115,9 +115,9 @@ def main(source: str, is_camera: bool = False):
 
             if not DISABLE_OBJECT_DETECTION and frame_count % object_detection_interval == 0:
                 detections = detect_objects(small_frame, size_scale)
-                for (detection, conf, (x1, y1), (x2, y2)) in detections:
-                    label = f'{detection} {conf:.2f}'
-                    logging.info(f"OBJECT: {detection}")
+                for (detection_label, confidence, (x1, y1), (x2, y2)) in detections:
+                    label = f'{detection_label} {confidence:.2f}'
+                    logging.info(f"OBJECT: {detection_label}")
                     cv2.rectangle(combined_frame, (x1, y1), (x2, y2), (0, 50, 150), 2)
                     cv2.putText(combined_frame, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 50, 150), 2)
 

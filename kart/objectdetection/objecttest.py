@@ -16,17 +16,17 @@ detected_objects = {
     "person": 0
 }
 objects_size = {
-    "car": 8000,
+    "car": 7000,
     "one-way-left": 1200,
     "sign-left-only": 1200,
     "speed-sign-20": 1500, 
     "speed-sign-30": 1000,
-    "stop-sign": 2000,
+    "stop-sign": 1800,
     "traffic-light-green": 1000,
     "traffic-light-red": 1000,
     "traffic-light-off": 1000,
-    "zebra-crossing": 8000,
-    "person": 8000
+    "zebra-crossing": 7000,
+    "person": 7000
 }
 
 frame_pool = 10
