@@ -7,13 +7,13 @@ def region_of_interest(img, vertices):
     masked_image = cv2.bitwise_and(img, mask)
     return masked_image
 
-def get_steering_command(x_at_target, x_norm):
-    if x_at_target < x_norm - 25:
-        return "steer_left"
-    elif x_at_target > x_norm + 25:
-        return "steer_right"
-    else:
-        return "go_straight"
+# def get_steering_command(x_at_target, x_norm):
+#     if x_at_target < x_norm - 25:
+#         return "steer_left"
+#     elif x_at_target > x_norm + 25:
+#         return "steer_right"
+#     else:
+#         return "go_straight"
 
 def get_x(line, y_norm):
     x1, y1, x2, y2 = line
@@ -102,7 +102,7 @@ def process_frame(frame):
 
 
 
-
+"""
 def process_frameold(path):
     # capture = cv2.VideoCapture(path)
     # capture.set(cv2.CAP_PROP_FPS, 30)  # Set FPS to 30
@@ -169,3 +169,4 @@ def process_frameold(path):
 
     capture.release()
     cv2.destroyAllWindows()
+"""
