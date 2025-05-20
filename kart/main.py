@@ -115,7 +115,8 @@ def main(source: str, is_camera: bool = False):
 
             if not DISABLE_OBJECT_DETECTION and frame_count % object_detection_interval == 0:
                 detections = detect_objects(small_frame, size_scale)
-                for (detection, label, (x1, y1), (x2, y2)) in detections:
+                for (detection, conf, (x1, y1), (x2, y2)) in detections:
+                    label = f'{detection} {conf:.2f}'
                     logging.info(f"OBJECT: {detection}")
                     cv2.rectangle(combined_frame, (x1, y1), (x2, y2), (0, 50, 150), 2)
                     cv2.putText(combined_frame, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 50, 150), 2)

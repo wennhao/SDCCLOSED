@@ -71,8 +71,7 @@ def detect_objects(frame, scale):
                 detected_objects[key] += 1
                 if detected_objects[key] >= frame_threshold and (abs(x1-x2)*abs(y1-y2)) >= (objects_size[key]*scale):
                     detected_objects[key] = 0
-                    label = f'{key} {conf:.2f}'
-                    detections.append((key, label, (x1, y1), (x2, y2)))
+                    detections.append((key, conf, (x1, y1), (x2, y2)))
                     # Display
                     # label = f'{key} {conf:.2f}'
                     # cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 50, 150), 3)
