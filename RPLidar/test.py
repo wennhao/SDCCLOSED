@@ -40,22 +40,23 @@ def update_line(num, iterator, line):
                 detected_front = True
         # Define "front left" as measurements with angle between 15° and 90°.
         elif 15 < angle < 90:
-            detected_left = True
+            if distance < FRONT_THRESHOLD_MM:           
+                detected_right = True
         # Define "front right" as measurements with angle between 270° and 345°.
         elif 270 < angle < 345:
-            detected_right = True
+            if distance < FRONT_THRESHOLD_MM:
+                detected_left = True
 
-    # Print detection messages if conditions are met.
 
 
-    if detected_front:
-        print(f"Warning: Object detected in front within 5 cm!")
+    # if detected_front:
+    #     print("Warning: Object detected in front within 50 cm!")
+    # if detected_left:
+    #     print("Warning: Object detected in left within 50 cm!")
+    if detected_right:
+        print("Warning: Object detected in right within 50 cm!")
     else :
         print("No object detected")
-    # if detected_left:
-    #     print("Object detected on the front left!")
-    # if detected_right:
-    #     print("Object detected on the front right!")
     
     return line
 
