@@ -11,7 +11,7 @@ import can
 # or i can do this
 # import steer as SteerManager, brake as BrakeManager, motor as MotorManager
 
-from statemachine.statemachine import MasterStateManager, LaneState, TrafficLightState
+from statemachine.statemachine import MasterStateManager, LaneState
 from linedetection.linedetection import process_frame
 #from objectdetection.objectdetection import detect_objects
 from objectdetection.objecttest import detect_objects
@@ -20,9 +20,10 @@ from objectdetection.objecttest import detect_objects
 logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s')
 
 DEBUG_MODE = True
-SHOW_VIDEO = True
-DISABLE_OBJECT_DETECTION = False
-DISABLE_LANE_DETECTION = True
+SHOW_VIDEO = False
+DISABLE_OBJECT_DETECTION = True
+DISABLE_LANE_DETECTION = False
+LOG_MODE = True
 
 angle_left = -1.25
 angle_center = 0.0
@@ -94,8 +95,6 @@ def main(source: str, is_camera: bool = False):
             if frame_count % frame_skip != 0:
                 continue  # Skip this frame
 
-            
-
 
             # ---- Lane Detection ----
             steering_cmd, lane_debug = None, None
@@ -129,11 +128,9 @@ def main(source: str, is_camera: bool = False):
             state_info = state_manager.update_states(
                 steering_cmd, 
                 detection_label, 
-                confidence,
-                detection_color
+                confidence
             )
             lane_state = state_info['lane_state']
-            traffic_state = state_info['traffic_state']
             override = state_info['override']
 
             logging.info(f"Lane: {lane_state}, Override: {override}")
@@ -145,44 +142,30 @@ def main(source: str, is_camera: bool = False):
                 if not DEBUG_MODE:
                     bus.send(forward_message(0))
             else:
-                match traffic_state:
-                    case TrafficLightState.RED:
-                        logging.warning("RED light → brake")
+                match lane_state:
+                    case LaneState.LEFT:
+                        logging.info("Steer Left")
                         if not DEBUG_MODE:
-                            bus.send(forward_message(0))
+                            bus.send(steer_message(angle_left))
+                            bus.send(forward_message(30))
 
-                    case TrafficLightState.GREEN:
-                        logging.info("GREEN light → go")
+                    case LaneState.RIGHT:
+                        logging.info("Steer Right")
+                        if not DEBUG_MODE:
+                            bus.send(steer_message(angle_right))
+                            bus.send(forward_message(30))
+
+                    case LaneState.STRAIGHT:
+                        logging.info("Go Straight")
                         if not DEBUG_MODE:
                             bus.send(steer_message(angle_center))
                             bus.send(forward_message(60))
 
                     case _:
-                        # No active traffic light: fall back to lane state
-                        match lane_state:
-                            case LaneState.LEFT:
-                                logging.info("Steer Left")
-                                if not DEBUG_MODE:
-                                    bus.send(steer_message(angle_left))
-                                    bus.send(forward_message(30))
-
-                            case LaneState.RIGHT:
-                                logging.info("Steer Right")
-                                if not DEBUG_MODE:
-                                    bus.send(steer_message(angle_right))
-                                    bus.send(forward_message(30))
-
-                            case LaneState.STRAIGHT:
-                                logging.info("Go Straight")
-                                if not DEBUG_MODE:
-                                    bus.send(steer_message(angle_center))
-                                    bus.send(forward_message(60))
-
-                            case _:
-                                logging.info("Searching for Lane")
-                                if not DEBUG_MODE:
-                                    bus.send(steer_message(angle_center))
-                                    bus.send(forward_message(0))
+                        logging.info("Searching for Lane")
+                        if not DEBUG_MODE:
+                            bus.send(steer_message(angle_center))
+                            bus.send(forward_message(0))
 
 
     finally:
