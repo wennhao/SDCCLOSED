@@ -5,6 +5,8 @@ class LaneState(Enum):
     STRAIGHT = auto()
     LEFT = auto()
     RIGHT = auto()
+    SHARPLEFT = auto()
+    SHARPRIGHT = auto()
 
 
 
@@ -29,6 +31,10 @@ class LaneFollowingState:
                 self.state = LaneState.RIGHT
             case "driving_straight":
                 self.state = LaneState.STRAIGHT
+            case "turning_left_sharp":
+                self.state = LaneState.SHARPLEFT
+            case "turning_right_sharp":
+                self.state = LaneState.SHARPRIGHT
             case _:
                 self.state = LaneState.SEARCHING
         return self.state

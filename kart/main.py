@@ -25,9 +25,11 @@ DISABLE_OBJECT_DETECTION = True
 DISABLE_LANE_DETECTION = False
 LOG_MODE = True
 
-angle_left = -1.25
+angle_left = -0.65
+angle_left_sharp = -1.20
 angle_center = 0.0
-angle_right = 1.25
+angle_right = 0.65
+angle_right_sharp = 1.20
 max_speed = 100
 min_speed = 0
 
@@ -160,6 +162,18 @@ def main(source: str, is_camera: bool = False):
                         if not DEBUG_MODE:
                             bus.send(steer_message(angle_center))
                             bus.send(forward_message(60))
+
+                    case LaneState.SHARPLEFT:
+                        logging.info("Steer Left Sharply")
+                        if not DEBUG_MODE:
+                            bus.send(steer_message(angle_left_sharp))
+                            bus.send(forward_message(30))
+
+                    case LaneState.SHARPRIGHT:
+                        logging.info("Steer Right Sharply")
+                        if not DEBUG_MODE:
+                            bus.send(steer_message(angle_right_sharp))
+                            bus.send(forward_message(30))
 
                     case _:
                         logging.info("Searching for Lane")

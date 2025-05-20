@@ -37,7 +37,7 @@ def process_frame(frame):
 
     height, width = edges.shape
     y_norm = int(height / 2)
-    x_norm = 550
+    x_norm = 540
     roi_border = width // 8 * 3
 
     region_vertices = [(roi_border, 0), (width, 0), (width, height), (roi_border, height)]
@@ -51,10 +51,12 @@ def process_frame(frame):
             x_val = get_x(line[0], y_norm)
             if x_val is not None:
                 x_at_target_values.append(x_val)
+                
+                #visualisation of the lines (not needed for tests)
                 x1, y1, x2, y2 = line[0]
                 cv2.line(frame, (x1, y1), (x2, y2), (0, 0, 255), 3)
 
-    # Draw guidelines
+    # Draw guidelines (visualisation of the lines (not needed for tests))
     cv2.line(frame, (0, y_norm), (width, y_norm), (255, 255, 0), 2)
     cv2.line(frame, (x_norm, 0), (x_norm, height), (255, 255, 0), 2)
     cv2.line(frame, (roi_border, 0), (roi_border, height), (0, 255, 255), 2)
@@ -62,20 +64,41 @@ def process_frame(frame):
 
     if x_at_target_values:
         x_at_target = int(np.median(x_at_target_values))
-        cv2.circle(frame, (x_at_target, y_norm), 8, (255, 0, 0), -1)
+        
+        #visualisation of the lines (not needed for tests)
+        cv2.circle(frame, (x_at_target, y_norm), 8, (255, 0, 0), -1) 
 
-        if x_at_target < x_norm - 25:
-            print("Detected: Turning Left")
+    #     if x_at_target < x_norm - 25:
+    #         return "turning_left", frame
+    #     elif x_at_target > x_norm + 25:
+    #         return "turning_right", frame
+    #     else:
+    #         return "driving_straight", frame
+    # else:
+    #     return "searching_lane", frame
+    
+        if x_at_target < x_norm - 100:
+            # print("hard left")
+            # return (-1.2) # left
+            return "turning_left_sharp", frame
+        elif x_at_target > x_norm + 100:
+            # print("hard right")
+            # return 1.2 # right
+            return "turning_right_sharp", frame
+        elif x_at_target < x_norm - 25:
+            # print("left")
+            # return (-0.65) # left
             return "turning_left", frame
         elif x_at_target > x_norm + 25:
-            print("Detected: Turning Right")
+            # print("right")
+            # return 0.65 # right
             return "turning_right", frame
         else:
-            print("Detected: Driving Straight")
+            # print("straight")
+            # return 0.0
             return "driving_straight", frame
     else:
-        print("Detected: No lanes - Searching")
-        return "searching_lane", frame
+        return "searching_lane", frame        
 
 
 
@@ -146,10 +169,3 @@ def process_frameold(path):
 
     capture.release()
     cv2.destroyAllWindows()
-
-# path = 'C:/Vakken/Jaar 2/Project 78 (SDC)/data/tests/testvideo2.mp4'
-# # path = 'C:/Vakken/Jaar 2/Project 78 (SDC)/data/smalldemoright/output_video.mp4'
-# detect_lanes(0)
-
-
-
