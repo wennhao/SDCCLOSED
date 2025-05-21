@@ -8,8 +8,16 @@ class LaneState(Enum):
     SHARPLEFT = auto()
     SHARPRIGHT = auto()
 
+class CrossState(Enum):
+    SEARCHING = auto()
+    READYTOCROSS = auto()
+    CROSSING = auto()
+    CROSSED = auto()
 
-
+class TrafficLightState(Enum):
+    RED = auto()
+    GREEN = auto()
+    NONE = auto()
 
 class LaneFollowingState:
     """
@@ -39,8 +47,6 @@ class LaneFollowingState:
                 self.state = LaneState.SEARCHING
         return self.state
 
-
-
 class MasterStateManager:
     """
     Combines lane-following logic with simple obstacle override (e.g., zebra crossings).
@@ -49,11 +55,24 @@ class MasterStateManager:
     def __init__(self):
         self.lane_state = LaneFollowingState()
         self.override = False
+        self.crossstate = CrossState.SEARCHING
+        self.trafficstate = TrafficLightState.NONE
 
-    def update_states(self, 
-                    steering_cmd: str, 
-                    detection_label: str = None, 
-                    confidence: float = 0.0) -> dict:
+    def crossing_direction(detections):
+
+        for (detection_label, (x1, y1), (x2, y2)) in detections:
+            if detection_label == 'zebra-crossing':
+                crossbox_position = [x1, y1, x2, y2]
+            if detection_label == 'person':
+                manbox_position = [x1, y1, x2, y2]
+        if manbox_position[0] < crossbox_position[0]:
+            direction = "left"
+        else:
+            direction = "right"
+
+        return direction
+
+    def update_states(self, steering_cmd: str) -> dict:
         """
         Updates the lane state and applies override logic based on object detection.
 
@@ -70,14 +89,14 @@ class MasterStateManager:
         # Update lane state
         lane_state = self.lane_state.update(steering_cmd)
 
-
         # Override logic: stop at zebra crossings
-        if detection_label == 'zebra-crossing' and confidence > 0.6:
+        '''if detection_label == 'zebra-crossing' and confidence > 0.6:
             self.override = True
         else:
-            self.override = False
+            self.override = False'''
 
         return {
             'lane_state': lane_state,
             'override': self.override
         }
+        

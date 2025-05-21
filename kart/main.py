@@ -122,6 +122,8 @@ def main(source: str, is_camera: bool = False):
                     cv2.rectangle(combined_frame, (x1, y1), (x2, y2), (0, 50, 150), 2)
                     cv2.putText(combined_frame, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 50, 150), 2)
 
+            man_direction = state_manager.crossing_direction(detections)
+            
             # ---- Display Debug Information ----        
             if SHOW_VIDEO:
                 cv2.imshow("Combined View", combined_frame)
@@ -131,8 +133,7 @@ def main(source: str, is_camera: bool = False):
             # ---- State Update ----
             state_info = state_manager.update_states(
                 steering_cmd, 
-                detection_label, 
-                confidence
+                detections
             )
             lane_state = state_info['lane_state']
             override = state_info['override']
@@ -141,7 +142,7 @@ def main(source: str, is_camera: bool = False):
 
 
             # ---- Actions / CAN messages ----
-            if override:
+            if man_direction == "right":
                 logging.warning("BRAKE: zebra crossing")
                 if not DEBUG_MODE:
                     bus.send(forward_message(0))
