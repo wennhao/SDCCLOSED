@@ -2,6 +2,7 @@
 from time import sleep
 from motor import forward_message
 from steer import steer_message
+from brake import set_brake_force_message
 import struct
 import sys
 import cv2
@@ -144,6 +145,7 @@ def main(source: str, is_camera: bool = False):
                 logging.warning("BRAKE: zebra crossing")
                 if not DEBUG_MODE:
                     bus.send(forward_message(0))
+                    bus.send(set_brake_force_message(100)) #?
             else:
                 match lane_state:
                     case LaneState.LEFT:
