@@ -55,22 +55,38 @@ class MasterStateManager:
     def __init__(self):
         self.lane_state = LaneFollowingState()
         self.override = False
-        self.crossstate = CrossState.SEARCHING
+        self.cross_state = CrossState.SEARCHING
         self.trafficstate = TrafficLightState.NONE
 
-    def crossing_direction(detections):
+    def check_if_crossing(self, manbox_position, crossbox_position):
+        match self.cross_state:
+            case CrossState.SEARCHING:
+                if manbox_position[0] < crossbox_position[0] or manbox_position[2] > crossbox_position[2]: #partly outside of crossing
+                    self.cross_state = CrossState.READYTOCROSS
+                    return True
+                elif manbox_position[0] > crossbox_position[0] and manbox_position[2] < crossbox_position[2]: #fully inside crossing
+                    self.cross_state = CrossState.CROSSING
+                    return True
+                else:
+                    return False
+            case CrossState.READYTOCROSS:
+                if manbox_position[0] > crossbox_position[0] and manbox_position[2] < crossbox_position[2]: #fully inside crossing
+                    self.cross_state = CrossState.CROSSING
+                return True
+            case CrossState.CROSSING:
+                if manbox_position[0] < crossbox_position[0] or manbox_position[2] > crossbox_position[2]: #partly outside of crossing
+                    self.cross_state = CrossState.CROSSED
+                    return False
+                else:
+                    return True
+            case CrossState.CROSSED:
+                return False
+            case _:
+                return False
+            
+    def reset_crossing(self):
+        self.cross_state = CrossState.SEARCHING
 
-        for (detection_label, (x1, y1), (x2, y2)) in detections:
-            if detection_label == 'zebra-crossing':
-                crossbox_position = [x1, y1, x2, y2]
-            if detection_label == 'person':
-                manbox_position = [x1, y1, x2, y2]
-        if manbox_position[0] < crossbox_position[0]:
-            direction = "left"
-        else:
-            direction = "right"
-
-        return direction
 
     def update_states(self, steering_cmd: str) -> dict:
         """

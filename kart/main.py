@@ -82,6 +82,9 @@ def main(source: str, is_camera: bool = False):
     if not cap.isOpened():
         print(f"Error: Could not open {'camera' if is_camera else 'video file'}: {source}")
         return
+    
+    crossing_state = False # set false first, then keep using prev value if objects not detected
+    no_crossing_person = 0
 
     global frame_count, last_detections
     size_scale = 0.2
@@ -116,14 +119,28 @@ def main(source: str, is_camera: bool = False):
 
             if not DISABLE_OBJECT_DETECTION and frame_count % object_detection_interval == 0:
                 detections = detect_objects(small_frame, size_scale)
+                manbox_position = []
+                crossbox_position = []
                 for (detection_label, confidence, (x1, y1), (x2, y2)) in detections:
                     label = f'{detection_label} {confidence:.2f}'
                     logging.info(f"OBJECT: {detection_label}")
                     cv2.rectangle(combined_frame, (x1, y1), (x2, y2), (0, 50, 150), 2)
                     cv2.putText(combined_frame, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 50, 150), 2)
 
-            man_direction = state_manager.crossing_direction(detections)
-            
+                    if detection_label == 'zebra-crossing':
+                        crossbox_position = [x1, y1, x2, y2]
+                    if detection_label == 'person':
+                        manbox_position = [x1, y1, x2, y2]
+                
+                if manbox_position != [] and crossbox_position != []:
+                    no_crossing_person = 0
+                    crossing_state = state_manager.check_if_crossing(manbox_position, crossbox_position) #update value if objects detected
+                else:
+                    no_crossing_person += 1
+                
+                if no_crossing_person > 50:
+                    state_manager.reset_crossing()
+
             # ---- Display Debug Information ----        
             if SHOW_VIDEO:
                 cv2.imshow("Combined View", combined_frame)
@@ -131,18 +148,18 @@ def main(source: str, is_camera: bool = False):
                     break
 
             # ---- State Update ----
-            state_info = state_manager.update_states(
-                steering_cmd, 
-                detections
-            )
+            state_info = state_manager.update_states(steering_cmd)
             lane_state = state_info['lane_state']
             override = state_info['override']
+
+            if crossing_state:
+                override = True
 
             logging.info(f"Lane: {lane_state}, Override: {override}")
 
 
             # ---- Actions / CAN messages ----
-            if man_direction == "right":
+            if override:
                 logging.warning("BRAKE: zebra crossing")
                 if not DEBUG_MODE:
                     bus.send(forward_message(0))
