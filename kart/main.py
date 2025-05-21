@@ -43,6 +43,8 @@ last_detections = []
 
 frame_skip = 10
 
+no_crossing_person_threshold = 50
+
 
 # change the interface to virtual for testing
 # change the interface to socketcan and can0 for real testing
@@ -138,7 +140,7 @@ def main(source: str, is_camera: bool = False):
                 else:
                     no_crossing_person += 1
                 
-                if no_crossing_person > 50:
+                if no_crossing_person > no_crossing_person_threshold: #if no person or crossing is detected for x frames, reset state
                     state_manager.reset_crossing()
 
             # ---- Display Debug Information ----        
