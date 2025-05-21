@@ -111,7 +111,7 @@ def main(source: str, is_camera: bool = False):
             # ---- Object Detection ----
             # Object detection less frequently
             # ---- Object Detection (Skipped for Testing) ----
-            detection_label, confidence, detection_color = None, 0.0, None
+            detection_label, confidence = None, 0.0
             detections = []
 
             if not DISABLE_OBJECT_DETECTION and frame_count % object_detection_interval == 0:
