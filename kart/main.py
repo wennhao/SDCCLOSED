@@ -42,6 +42,7 @@ object_detection_interval = 5
 last_detections = []
 
 frame_skip = 10
+size_scale = 0.5
 
 no_crossing_person_threshold = 50
 
@@ -88,7 +89,6 @@ def main(source: str, is_camera: bool = False):
     no_crossing_person = 0
 
     global frame_count, last_detections
-    size_scale = 1
 
     try:
         while True:
@@ -122,6 +122,7 @@ def main(source: str, is_camera: bool = False):
                 detections = detect_objects(small_frame, size_scale)
                 manbox_position = []
                 crossbox_position = []
+                traffic_light_red = False
                 for (detection_label, confidence, (x1, y1), (x2, y2)) in detections:
                     label = f'{detection_label} {confidence:.2f}'
                     logging.info(f"OBJECT: {detection_label} | coords: ({x1},{y1}), ({x2},{y2})")
@@ -132,6 +133,9 @@ def main(source: str, is_camera: bool = False):
                         crossbox_position = [x1, y1, x2, y2]
                     if detection_label == 'person':
                         manbox_position = [x1, y1, x2, y2]
+                    
+                    if detection_label == 'traffic-light-red':
+                        traffic_light_red = True
                 
                 if manbox_position == [] or crossbox_position == [] or state_manager.crossed():
                     no_crossing_person += 1
@@ -145,7 +149,7 @@ def main(source: str, is_camera: bool = False):
                     break
 
             # ---- State Update ----
-            state_info = state_manager.update_states(steering_cmd, manbox_position, crossbox_position)
+            state_info = state_manager.update_states(steering_cmd, manbox_position, crossbox_position, traffic_light_red)
 
             lane_state = state_info['lane_state']
             override = state_info['override']

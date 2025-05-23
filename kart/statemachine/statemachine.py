@@ -14,11 +14,6 @@ class CrossState(Enum):
     CROSSING = auto()
     CROSSED = auto()
 
-class TrafficLightState(Enum):
-    RED = auto()
-    GREEN = auto()
-    NONE = auto()
-
 class LaneFollowingState:
     """
     Handles basic lane following logic.
@@ -57,7 +52,6 @@ class MasterStateManager:
         self.override = False
         self.cross_bool = False
         self.cross_state = CrossState.SEARCHING
-        self.trafficstate = TrafficLightState.NONE
 
     def check_if_crossing(self, manbox_position, crossbox_position):
         print(manbox_position, crossbox_position)
@@ -95,7 +89,7 @@ class MasterStateManager:
         self.override = False
 
 
-    def update_states(self, steering_cmd: str, manbox_position, crossbox_position) -> dict:
+    def update_states(self, steering_cmd: str, manbox_position, crossbox_position, traffic_light_red) -> dict:
         """
         Updates the lane state and applies override logic based on object detection.
 
@@ -116,7 +110,7 @@ class MasterStateManager:
         else:
             self.cross_bool = False
         
-        self.override = self.cross_bool #add other situations
+        self.override = self.cross_bool or traffic_light_red #add other situations
 
         return {
             'lane_state': lane_state,
