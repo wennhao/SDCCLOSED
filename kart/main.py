@@ -42,7 +42,7 @@ object_detection_interval = 5
 last_detections = []
 
 frame_skip = 10
-size_scale = 0.5
+size_scale = 0.6 #0.6 for line detection
 
 no_crossing_person_threshold = 50
 
