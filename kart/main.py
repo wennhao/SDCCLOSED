@@ -20,8 +20,8 @@ from objectdetection.objecttest import detect_objects
 # Initialize logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s')
 
-DEBUG_MODE = False
-SHOW_VIDEO = False
+DEBUG_MODE = True
+SHOW_VIDEO = True
 DISABLE_OBJECT_DETECTION = False
 DISABLE_LANE_DETECTION = True
 LOG_MODE = True
