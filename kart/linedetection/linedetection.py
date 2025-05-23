@@ -31,13 +31,13 @@ def get_x(line, y_norm):
 def process_frame(frame):
     blurred = cv2.GaussianBlur(frame, (5, 5), 0)
     gray = cv2.cvtColor(blurred, cv2.COLOR_BGR2GRAY)
-    grayscale = cv2.inRange(gray, 135, 255) #150
+    grayscale = cv2.inRange(gray, 150, 255) #150
 
     edges = cv2.Canny(grayscale, 70, 200)
 
     height, width = edges.shape
     y_norm = int(height / 2)
-    x_norm = 540
+    x_norm = 540/840 * width
     roi_border = width // 8 * 3
 
     region_vertices = [(roi_border, 0), (width, 0), (width, height), (roi_border, height)]
