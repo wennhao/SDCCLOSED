@@ -65,32 +65,33 @@ class MasterStateManager:
             case CrossState.SEARCHING:
                 if manbox_position[0] < crossbox_position[0] or manbox_position[2] > crossbox_position[2]: #partly outside of crossing
                     self.cross_state = CrossState.READYTOCROSS
-                    return True
+                    self.override = True
                 elif manbox_position[0] > crossbox_position[0] and manbox_position[2] < crossbox_position[2]: #fully inside crossing
                     self.cross_state = CrossState.CROSSING
-                    return True
+                    self.override = True
                 else:
-                    return False
+                    self.override = False
             case CrossState.READYTOCROSS:
                 if manbox_position[0] > crossbox_position[0] and manbox_position[2] < crossbox_position[2]: #fully inside crossing
                     self.cross_state = CrossState.CROSSING
-                return True
+                self.override = True
             case CrossState.CROSSING:
                 if manbox_position[0] < crossbox_position[0] or manbox_position[2] > crossbox_position[2]: #partly outside of crossing
                     self.cross_state = CrossState.CROSSED
-                    return False
+                    self.override = False
                 else:
-                    return True
+                    override = True
             case CrossState.CROSSED:
-                return False
+                self.override = False
             case _:
-                return False
+                self.override = False
             
     def crossed(self):
         return self.cross_state == CrossState.CROSSED
 
     def reset_crossing(self):
         self.cross_state = CrossState.SEARCHING
+        self.override = False
 
 
     def update_states(self, steering_cmd: str) -> dict:
@@ -110,11 +111,6 @@ class MasterStateManager:
         # Update lane state
         lane_state = self.lane_state.update(steering_cmd)
 
-        # Override logic: stop at zebra crossings
-        '''if detection_label == 'zebra-crossing' and confidence > 0.6:
-            self.override = True
-        else:
-            self.override = False'''
 
         return {
             'lane_state': lane_state,

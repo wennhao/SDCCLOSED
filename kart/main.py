@@ -85,7 +85,6 @@ def main(source: str, is_camera: bool = False):
         print(f"Error: Could not open {'camera' if is_camera else 'video file'}: {source}")
         return
     
-    crossing_state = False # set false first, then keep using prev value if objects not detected
     no_crossing_person = 0
 
     global frame_count, last_detections
@@ -138,12 +137,10 @@ def main(source: str, is_camera: bool = False):
                     no_crossing_person += 1
                 else:
                     no_crossing_person = 0
-                    crossing_state = state_manager.check_if_crossing(manbox_position, crossbox_position) #update value if objects detected
-                    logging.info({crossing_state})
+                    state_manager.check_if_crossing(manbox_position, crossbox_position) #update value if objects detected
                 
                 if no_crossing_person > no_crossing_person_threshold: #if no person or crossing is detected for x frames, reset state
                     state_manager.reset_crossing()
-                    crossing_state = False
 
             # ---- Display Debug Information ----        
             if SHOW_VIDEO:
@@ -156,10 +153,7 @@ def main(source: str, is_camera: bool = False):
             lane_state = state_info['lane_state']
             override = state_info['override']
 
-            if crossing_state:
-                override = True
-
-            logging.info(f"Lane: {lane_state}, Override: {crossing_state}")
+            logging.info(f"Lane: {lane_state}, Override: {override}")
 
 
             # ---- Actions / CAN messages ----
