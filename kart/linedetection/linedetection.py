@@ -57,16 +57,16 @@ def process_frame(frame):
                 cv2.line(frame, (x1, y1), (x2, y2), (0, 0, 255), 3)
 
     # Draw guidelines (visualisation of the lines (not needed for tests))
-    # cv2.line(frame, (0, y_norm), (width, y_norm), (255, 255, 0), 2)
-    # cv2.line(frame, (x_norm, 0), (x_norm, height), (255, 255, 0), 2)
-    # cv2.line(frame, (roi_border, 0), (roi_border, height), (0, 255, 255), 2)
-    # print("Detected lane x-values:", x_at_target_values)
+    cv2.line(frame, (0, y_norm), (width, y_norm), (255, 255, 0), 2)
+    cv2.line(frame, (x_norm, 0), (x_norm, height), (255, 255, 0), 2)
+    cv2.line(frame, (roi_border, 0), (roi_border, height), (0, 255, 255), 2)
+    print("Detected lane x-values:", x_at_target_values)
 
     if x_at_target_values:
         x_at_target = int(np.median(x_at_target_values))
         
         #visualisation of the lines (not needed for tests)
-        # cv2.circle(frame, (x_at_target, y_norm), 8, (255, 0, 0), -1) 
+        cv2.circle(frame, (x_at_target, y_norm), 8, (255, 0, 0), -1) 
 
     #     if x_at_target < x_norm - 25:
     #         return "turning_left", frame
