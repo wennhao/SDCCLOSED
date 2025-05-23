@@ -23,7 +23,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(me
 DEBUG_MODE = True
 SHOW_VIDEO = True
 DISABLE_OBJECT_DETECTION = False
-DISABLE_LANE_DETECTION = True
+DISABLE_LANE_DETECTION = False
 LOG_MODE = True
 
 angle_left = -0.65
@@ -107,7 +107,7 @@ def main(source: str, is_camera: bool = False):
             steering_cmd, lane_debug = None, None
 
             if not DISABLE_LANE_DETECTION:
-                steering_cmd, lane_debug = process_frame(small_frame)
+                steering_cmd, lane_debug = process_frame(small_frame.copy())
                 combined_frame = lane_debug.copy()
             else:
                 combined_frame = small_frame.copy()
