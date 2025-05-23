@@ -20,8 +20,8 @@ from objectdetection.objecttest import detect_objects
 # Initialize logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s')
 
-DEBUG_MODE = True
-SHOW_VIDEO = True
+DEBUG_MODE = False
+SHOW_VIDEO = False
 DISABLE_OBJECT_DETECTION = False
 DISABLE_LANE_DETECTION = True
 LOG_MODE = True
@@ -173,41 +173,47 @@ def main(source: str, is_camera: bool = False):
                     case LaneState.LEFT:
                         logging.info("Steer Left")
                         if not DEBUG_MODE:
-                            bus.send(steer_message(angle_left))
-                            bus.send(forward_message(30))
+                            bus.send(steer_message(-0.65)) #angle_left
+                            bus.send(forward_message(70))
+                            # bus.send(set_brake_force_message(0)) #?
 
                     case LaneState.RIGHT:
                         logging.info("Steer Right")
                         if not DEBUG_MODE:
-                            bus.send(steer_message(angle_right))
+                            bus.send(steer_message(0.65))
                             bus.send(forward_message(30))
-
+                            # bus.send(set_brake_force_message(0)) #?
                     case LaneState.STRAIGHT:
                         logging.info("Go Straight")
                         if not DEBUG_MODE:
                             bus.send(steer_message(angle_center))
                             bus.send(forward_message(60))
+                            # bus.send(set_brake_force_message(0))
 
                     case LaneState.SHARPLEFT:
                         logging.info("Steer Left Sharply")
                         if not DEBUG_MODE:
                             bus.send(steer_message(angle_left_sharp))
-                            bus.send(forward_message(30))
+                            bus.send(forward_message(70))
+                            # bus.send(set_brake_force_message(0))
 
                     case LaneState.SHARPRIGHT:
                         logging.info("Steer Right Sharply")
                         if not DEBUG_MODE:
                             bus.send(steer_message(angle_right_sharp))
                             bus.send(forward_message(30))
+                            # bus.send(set_brake_force_message(0))
 
                     case _:
                         logging.info("Searching for Lane")
                         if not DEBUG_MODE:
-                            bus.send(steer_message(angle_center))
-                            bus.send(forward_message(0))
+                            bus.send(steer_message(0.2))
+                            bus.send(forward_message(20))
+                            # bus.send(set_brake_force_message(0))
 
 
     finally:
+        bus.send(steer_message(angle_center))
         cap.release()
         cv2.destroyAllWindows()
         bus.shutdown()
