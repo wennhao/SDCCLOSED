@@ -25,8 +25,8 @@ objects_size = {
     "traffic-light-green": 1000,
     "traffic-light-red": 1000,
     "traffic-light-off": 1000,
-    "zebra-crossing": 6000,
-    "person": 6000
+    "zebra-crossing": 5000,
+    "person": 5000
 }
 
 frame_pool = 10

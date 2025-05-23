@@ -23,7 +23,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(me
 DEBUG_MODE = True
 SHOW_VIDEO = True
 DISABLE_OBJECT_DETECTION = False
-DISABLE_LANE_DETECTION = False
+DISABLE_LANE_DETECTION = True
 LOG_MODE = True
 
 angle_left = -0.65
@@ -89,7 +89,7 @@ def main(source: str, is_camera: bool = False):
     no_crossing_person = 0
 
     global frame_count, last_detections
-    size_scale = 0.2
+    size_scale = 1
 
     try:
         while True:
@@ -125,7 +125,7 @@ def main(source: str, is_camera: bool = False):
                 crossbox_position = []
                 for (detection_label, confidence, (x1, y1), (x2, y2)) in detections:
                     label = f'{detection_label} {confidence:.2f}'
-                    logging.info(f"OBJECT: {detection_label}")
+                    logging.info(f"OBJECT: {detection_label} | coords: ({x1},{y1}), ({x2},{y2})")
                     cv2.rectangle(combined_frame, (x1, y1), (x2, y2), (0, 50, 150), 2)
                     cv2.putText(combined_frame, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 50, 150), 2)
 
@@ -134,14 +134,16 @@ def main(source: str, is_camera: bool = False):
                     if detection_label == 'person':
                         manbox_position = [x1, y1, x2, y2]
                 
-                if manbox_position != [] and crossbox_position != []:
+                if manbox_position == [] or crossbox_position == [] or state_manager.crossed():
+                    no_crossing_person += 1
+                else:
                     no_crossing_person = 0
                     crossing_state = state_manager.check_if_crossing(manbox_position, crossbox_position) #update value if objects detected
-                else:
-                    no_crossing_person += 1
+                    logging.info({crossing_state})
                 
                 if no_crossing_person > no_crossing_person_threshold: #if no person or crossing is detected for x frames, reset state
                     state_manager.reset_crossing()
+                    crossing_state = False
 
             # ---- Display Debug Information ----        
             if SHOW_VIDEO:
@@ -157,7 +159,7 @@ def main(source: str, is_camera: bool = False):
             if crossing_state:
                 override = True
 
-            logging.info(f"Lane: {lane_state}, Override: {override}")
+            logging.info(f"Lane: {lane_state}, Override: {crossing_state}")
 
 
             # ---- Actions / CAN messages ----

@@ -59,6 +59,8 @@ class MasterStateManager:
         self.trafficstate = TrafficLightState.NONE
 
     def check_if_crossing(self, manbox_position, crossbox_position):
+        print(manbox_position, crossbox_position)
+        print(self.cross_state)
         match self.cross_state:
             case CrossState.SEARCHING:
                 if manbox_position[0] < crossbox_position[0] or manbox_position[2] > crossbox_position[2]: #partly outside of crossing
@@ -84,6 +86,9 @@ class MasterStateManager:
             case _:
                 return False
             
+    def crossed(self):
+        return self.cross_state == CrossState.CROSSED
+
     def reset_crossing(self):
         self.cross_state = CrossState.SEARCHING
 
