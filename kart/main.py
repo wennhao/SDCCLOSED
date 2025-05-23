@@ -137,10 +137,6 @@ def main(source: str, is_camera: bool = False):
                     no_crossing_person += 1
                 else:
                     no_crossing_person = 0
-                    state_manager.check_if_crossing(manbox_position, crossbox_position) #update value if objects detected
-                
-                if no_crossing_person > no_crossing_person_threshold: #if no person or crossing is detected for x frames, reset state
-                    state_manager.reset_crossing()
 
             # ---- Display Debug Information ----        
             if SHOW_VIDEO:
@@ -149,9 +145,13 @@ def main(source: str, is_camera: bool = False):
                     break
 
             # ---- State Update ----
-            state_info = state_manager.update_states(steering_cmd)
+            state_info = state_manager.update_states(steering_cmd, manbox_position, crossbox_position)
+
             lane_state = state_info['lane_state']
             override = state_info['override']
+
+            if no_crossing_person > no_crossing_person_threshold: #if no person or crossing is detected for x frames, reset state
+                state_manager.reset_crossing()
 
             logging.info(f"Lane: {lane_state}, Override: {override}")
 

@@ -55,6 +55,7 @@ class MasterStateManager:
     def __init__(self):
         self.lane_state = LaneFollowingState()
         self.override = False
+        self.cross_bool = False
         self.cross_state = CrossState.SEARCHING
         self.trafficstate = TrafficLightState.NONE
 
@@ -65,26 +66,26 @@ class MasterStateManager:
             case CrossState.SEARCHING:
                 if manbox_position[0] < crossbox_position[0] or manbox_position[2] > crossbox_position[2]: #partly outside of crossing
                     self.cross_state = CrossState.READYTOCROSS
-                    self.override = True
+                    return True
                 elif manbox_position[0] > crossbox_position[0] and manbox_position[2] < crossbox_position[2]: #fully inside crossing
                     self.cross_state = CrossState.CROSSING
-                    self.override = True
+                    return True
                 else:
-                    self.override = False
+                    return False
             case CrossState.READYTOCROSS:
                 if manbox_position[0] > crossbox_position[0] and manbox_position[2] < crossbox_position[2]: #fully inside crossing
                     self.cross_state = CrossState.CROSSING
-                self.override = True
+                return True
             case CrossState.CROSSING:
                 if manbox_position[0] < crossbox_position[0] or manbox_position[2] > crossbox_position[2]: #partly outside of crossing
                     self.cross_state = CrossState.CROSSED
-                    self.override = False
+                    return False
                 else:
-                    override = True
+                    return True
             case CrossState.CROSSED:
-                self.override = False
+                return False
             case _:
-                self.override = False
+                return False
             
     def crossed(self):
         return self.cross_state == CrossState.CROSSED
@@ -94,7 +95,7 @@ class MasterStateManager:
         self.override = False
 
 
-    def update_states(self, steering_cmd: str) -> dict:
+    def update_states(self, steering_cmd: str, manbox_position, crossbox_position) -> dict:
         """
         Updates the lane state and applies override logic based on object detection.
 
@@ -110,7 +111,12 @@ class MasterStateManager:
         """
         # Update lane state
         lane_state = self.lane_state.update(steering_cmd)
-
+        if (manbox_position != [] and crossbox_position != []):
+            self.cross_bool = self.check_if_crossing(manbox_position, crossbox_position)
+        else:
+            self.cross_bool = False
+        
+        self.override = self.cross_bool #add other situations
 
         return {
             'lane_state': lane_state,
