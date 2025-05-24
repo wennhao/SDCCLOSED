@@ -37,7 +37,7 @@ def process_frame(frame):
 
     height, width = edges.shape
     y_norm = int(height / 2)
-    x_norm = 540/840 * width
+    x_norm = int(540/840 * width)
     roi_border = width // 8 * 3
 
     region_vertices = [(roi_border, 0), (width, 0), (width, height), (roi_border, height)]
