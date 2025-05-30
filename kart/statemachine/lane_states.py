@@ -1,5 +1,5 @@
 from enum import Enum, auto
-from abc import ABC, abstractmethod
+from abc import ABC, abstractmethod # ABC - Abstract Base Class, abstractmethod - decorator for abstract methods
 
 class LaneStateEnum(Enum):
     SEARCHING = auto()

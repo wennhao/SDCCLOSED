@@ -66,7 +66,8 @@ def main(source: str, is_camera: bool = False):
 
             manbox_position = []
             crossbox_position = []
-            traffic_light_red = False
+            detected_red = False
+            detected_green = False
 
             if not DISABLE_OBJECT_DETECTION and frame_count % object_detection_interval == 0:
                 detections = detect_objects(small_frame, size_scale)
@@ -80,7 +81,9 @@ def main(source: str, is_camera: bool = False):
                     elif label == 'person':
                         manbox_position = [x1, y1, x2, y2]
                     elif label == 'traffic-light-red':
-                        traffic_light_red = True
+                        detected_red = True
+                    elif label == 'traffic-light-green':
+                        detected_green = True
 
                 if not manbox_position or not crossbox_position or state_manager.crossed():
                     no_crossing_person += 1
@@ -92,7 +95,14 @@ def main(source: str, is_camera: bool = False):
                 if cv2.waitKey(1) & 0xFF == ord('q'):
                     break
 
-            state_info = state_manager.update(steering_cmd, manbox_position, crossbox_position, traffic_light_red)
+            state_info = state_manager.update(
+                steering_cmd, 
+                manbox_position, 
+                crossbox_position, 
+                detected_red, 
+                detected_green
+            )
+
             lane_state_obj = state_info['lane_state']
             override = state_info['override']
 
@@ -100,9 +110,11 @@ def main(source: str, is_camera: bool = False):
                 state_manager.reset_crossing()
 
             logging.info(f"Lane: {lane_state_obj.__class__.__name__}, Override: {override}")
+            logging.info(f"Crossing State: {state_manager.cross_manager.state}")
+            logging.info(f"Traffic Light State: {state_manager.traffic_manager.state}")
 
             if override:
-                logging.warning("BRAKE: zebra crossing or red light")
+                logging.warning(f"Override triggered: {override}")
                 controller.stop()
             else:
                 lane_state_obj.act(controller)
