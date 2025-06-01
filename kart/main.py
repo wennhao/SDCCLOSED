@@ -1,31 +1,31 @@
-# --- main.py ---
 import argparse
 import logging
 import cv2
 import can
 
 from time import sleep
-from movement.motor import forward_message # Function
-from movement.steer import steer_message # Function
-from movement.brake import set_brake_force_message # Function
 from linedetection.linedetection import process_frame # Function
 from objectdetection.objectdetection import detect_objects # Function
 from carcontroller import CarController # Class
 from statemachine.master_state_manager import MasterStateManager # Class
 
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s')
 
+# Constants
 DEBUG_MODE = True
 SHOW_VIDEO = True
 DISABLE_OBJECT_DETECTION = False
 DISABLE_LANE_DETECTION = False
 LOG_MODE = True
 
+# Variables
 size_scale = 0.6 if DEBUG_MODE else 1.0
 frame_skip = 10
 object_detection_interval = 5
 no_crossing_person_threshold = 50
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s')
+
 
 def initialize_can():
     if DEBUG_MODE:
@@ -106,7 +106,7 @@ def main(source: str, is_camera: bool = False):
                 detected_green
             )
 
-            lane_state_obj = state_info['lane_state']
+            lane_state_obj = state_info['lane_state'] # Gets the current lane state object e.g. Searching, Straight, Left, Right, SharpLeft, SharpRight
             override = state_info['override']
 
             if no_crossing_person > no_crossing_person_threshold:
@@ -119,13 +119,13 @@ def main(source: str, is_camera: bool = False):
             logging.info(override)
             logging.info(override)
 
-            if override:
+            if override: # override happens due to crossing or traffic light
                 if LOG_MODE:
                     logging.warning(f"Override triggered: {override}")
 
                 controller.stop() # Stop the kart from moving
             else:
-                lane_state_obj.act(controller)
+                lane_state_obj.act(controller) # Perform the action based on the current lane state
 
     finally:
         controller.steer(0.0)

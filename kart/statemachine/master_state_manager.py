@@ -28,6 +28,7 @@ class MasterStateManager:
         self.update_lane_state(steering_cmd)
 
         crossing_override = self.cross_manager.update(manbox, crossbox)
+        
         self.traffic_manager.update(detected_red, detected_green)
         traffic_override = self.traffic_manager.is_red()
 

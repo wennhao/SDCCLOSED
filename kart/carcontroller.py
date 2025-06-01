@@ -1,3 +1,9 @@
+"""
+This module handles the control of the car(kart) by sending messages to the bus.
+
+main.py will use this to control the car's movement, steering, and braking.
+
+"""
 class CarController:
     def __init__(self, bus, debug=False):
         self.bus = bus
