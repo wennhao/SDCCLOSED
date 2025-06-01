@@ -9,7 +9,7 @@ from movement.motor import forward_message # Function
 from movement.steer import steer_message # Function
 from movement.brake import set_brake_force_message # Function
 from linedetection.linedetection import process_frame # Function
-from objectdetection.objecttest import detect_objects # Function
+from objectdetection.objectdetection import detect_objects # Function
 from carcontroller import CarController # Class
 from statemachine.master_state_manager import MasterStateManager # Class
 
@@ -94,7 +94,10 @@ def main(source: str, is_camera: bool = False):
                 cv2.imshow("Combined View", combined_frame)
                 if cv2.waitKey(1) & 0xFF == ord('q'):
                     break
-
+            
+            # Update the state manager with the current information
+            if DEBUG_MODE:
+                logging.debug(f"Frame {frame_count}: Steering Command: {steering_cmd}, Manbox: {manbox_position}, Crossbox: {crossbox_position}, Detected Red: {detected_red}, Detected Green: {detected_green}")
             state_info = state_manager.update(
                 steering_cmd, 
                 manbox_position, 
@@ -108,17 +111,19 @@ def main(source: str, is_camera: bool = False):
 
             if no_crossing_person > no_crossing_person_threshold:
                 state_manager.reset_crossing()
-
-            logging.info(f"Lane: {lane_state_obj.__class__.__name__}, Override: {override}")
-            logging.info(f"Crossing State: {state_manager.cross_manager.state}")
-            logging.info(f"Traffic Light State: {state_manager.traffic_manager.state}")
+            if LOG_MODE:
+                logging.info(f"Lane: {lane_state_obj.__class__.__name__}, Override: {override}")
+                logging.info(f"Crossing State: {state_manager.cross_manager.state}")
+                logging.info(f"Traffic Light State: {state_manager.traffic_manager.state}")
             logging.info(override)
             logging.info(override)
             logging.info(override)
 
             if override:
-                logging.warning(f"Override triggered: {override}")
-                controller.stop()
+                if LOG_MODE:
+                    logging.warning(f"Override triggered: {override}")
+
+                controller.stop() # Stop the kart from moving
             else:
                 lane_state_obj.act(controller)
 
