@@ -9,5 +9,5 @@ stop-sign				|   3000
 traffic-light-green		|   1500
 traffic-light-red		|   1500
 traffic-light-off		|   1500
-zebra-crossing			|   8000
-person					|   8000
+zebra-crossing			|   7000
+person					|   7000

@@ -112,6 +112,9 @@ def main(source: str, is_camera: bool = False):
             logging.info(f"Lane: {lane_state_obj.__class__.__name__}, Override: {override}")
             logging.info(f"Crossing State: {state_manager.cross_manager.state}")
             logging.info(f"Traffic Light State: {state_manager.traffic_manager.state}")
+            logging.info(override)
+            logging.info(override)
+            logging.info(override)
 
             if override:
                 logging.warning(f"Override triggered: {override}")

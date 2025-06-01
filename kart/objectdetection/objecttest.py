@@ -22,11 +22,11 @@ objects_size = {
     "speed-sign-20": 1500, 
     "speed-sign-30": 1000,
     "stop-sign": 1800,
-    "traffic-light-green": 1000,
-    "traffic-light-red": 1000,
-    "traffic-light-off": 1000,
-    "zebra-crossing": 5000,
-    "person": 5000
+    "traffic-light-green": 900,
+    "traffic-light-red": 900,
+    "traffic-light-off": 900,
+    "zebra-crossing": 4500,
+    "person": 4500
 }
 
 frame_pool = 10
