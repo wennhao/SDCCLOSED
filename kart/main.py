@@ -48,6 +48,10 @@ def main(source: str, is_camera: bool = False):
 
     try:
         while True:
+            """
+            FRAME PROCESSING
+            Video Capture setup and frame reading.
+            """
             ret, frame = cap.read()
             if not ret:
                 break
@@ -58,12 +62,21 @@ def main(source: str, is_camera: bool = False):
 
             small_frame = cv2.resize(frame, (0, 0), fx=size_scale, fy=size_scale)
             steering_cmd, lane_debug = None, None
+
+            """
+            LANE DETECTION
+            This section processes the frame for lane detection and returns the steering command.
+            """
             if not DISABLE_LANE_DETECTION:
                 steering_cmd, lane_debug = process_frame(small_frame.copy())
                 combined_frame = lane_debug.copy()
             else:
                 combined_frame = small_frame.copy()
 
+            """
+            OBJECT DETECTION
+            This section detects objects in the frame and updates the state manager with the detected objects.
+            """
             manbox_position = []
             crossbox_position = []
             detected_red = False
@@ -90,6 +103,7 @@ def main(source: str, is_camera: bool = False):
                 else:
                     no_crossing_person = 0
 
+            # Display the frame with detected objects and lane markings
             if SHOW_VIDEO:
                 cv2.imshow("Combined View", combined_frame)
                 if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -107,17 +121,16 @@ def main(source: str, is_camera: bool = False):
             )
 
             lane_state_obj = state_info['lane_state'] # Gets the current lane state object e.g. Searching, Straight, Left, Right, SharpLeft, SharpRight
-            override = state_info['override']
+            override = state_info['override'] # True if crossing or traffic light state requires override
 
             if no_crossing_person > no_crossing_person_threshold:
-                state_manager.reset_crossing()
+                state_manager.reset_crossing() # Reset crossing state if no person detected for a while
+
             if LOG_MODE:
                 logging.info(f"Lane: {lane_state_obj.__class__.__name__}, Override: {override}")
                 logging.info(f"Crossing State: {state_manager.cross_manager.state}")
                 logging.info(f"Traffic Light State: {state_manager.traffic_manager.state}")
-            logging.info(override)
-            logging.info(override)
-            logging.info(override)
+                logging.info(override)
 
             if override: # override happens due to crossing or traffic light
                 if LOG_MODE:
@@ -128,7 +141,7 @@ def main(source: str, is_camera: bool = False):
                 lane_state_obj.act(controller) # Perform the action based on the current lane state
 
     finally:
-        controller.steer(0.0)
+        controller.steer(0.0) # Reset steering, because the kart breaks when stopped while wheels are turned
         cap.release()
         cv2.destroyAllWindows()
         bus.shutdown()
