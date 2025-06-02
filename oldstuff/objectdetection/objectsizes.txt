@@ -1,0 +1,13 @@
+object                  |  size (x*y)
+========================+==============
+car					    |   8000
+one-way-left			|   1200
+sign-left-only			|   1400
+speed-sign-20			|   2000
+speed-sign-30			|   2000
+stop-sign				|   3000
+traffic-light-green		|   1500
+traffic-light-red		|   1500
+traffic-light-off		|   1500
+zebra-crossing			|   7000
+person					|   7000
