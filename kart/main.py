@@ -64,16 +64,6 @@ def main(source: str, is_camera: bool = False):
             steering_cmd, lane_debug = None, None
 
             """
-            LANE DETECTION
-            This section processes the frame for lane detection and returns the steering command.
-            """
-            if not DISABLE_LANE_DETECTION:
-                steering_cmd, lane_debug = process_frame(small_frame.copy())
-                combined_frame = lane_debug.copy()
-            else:
-                combined_frame = small_frame.copy()
-
-            """
             OBJECT DETECTION
             This section detects objects in the frame and updates the state manager with the detected objects.
             """
@@ -81,6 +71,8 @@ def main(source: str, is_camera: bool = False):
             crossbox_position = []
             detected_red = False
             detected_green = False
+            left_turn = False
+            frames_after_left_turn = 0
 
             if not DISABLE_OBJECT_DETECTION and frame_count % object_detection_interval == 0:
                 detections = detect_objects(small_frame, size_scale)
@@ -98,11 +90,30 @@ def main(source: str, is_camera: bool = False):
                         detected_red = True
                     elif label == 'traffic-light-green':
                         detected_green = True
+                    elif label == 'one-way-left' or label == 'sign-left-only':
+                        left_turn = True
+                    elif left_turn and label != 'one-way-left' and label != 'sign-left-only':
+                        frames_after_left_turn += 1
+                        if frames_after_left_turn == 15:
+                            left_turn = False
 
                 if not manbox_position or not crossbox_position or state_manager.crossed():
                     no_crossing_person_counter += 1
                 else:
                     no_crossing_person_counter = 0
+
+            """
+            LANE DETECTION
+            This section processes the frame for lane detection and returns the steering command.
+            """
+            if not DISABLE_LANE_DETECTION:
+                if left_turn:
+                    steering_cmd, lane_debug = process_frame(small_frame.copy(), "LEFT")
+                else:
+                    steering_cmd, lane_debug = process_frame(small_frame.copy(), "RIGHT")
+                combined_frame = lane_debug.copy()
+            else:
+                combined_frame = small_frame.copy()       
 
             # Display the frame with detected objects and lane markings
             if SHOW_VIDEO:
