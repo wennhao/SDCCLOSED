@@ -99,9 +99,9 @@ def main(source: str, is_camera: bool = False):
                         detected_green = True
 
                 if not manbox_position or not crossbox_position or state_manager.crossed():
-                    no_crossing_person += 1
+                    no_crossing_person_counter += 1
                 else:
-                    no_crossing_person = 0
+                    no_crossing_person_counter = 0
 
             # Display the frame with detected objects and lane markings
             if SHOW_VIDEO:
@@ -123,7 +123,7 @@ def main(source: str, is_camera: bool = False):
             lane_state_obj = state_info['lane_state'] # Gets the current lane state object e.g. Searching, Straight, Left, Right, SharpLeft, SharpRight
             override = state_info['override'] # True if crossing or traffic light state requires override
 
-            if no_crossing_person > no_crossing_person_threshold:
+            if no_crossing_person_counter > no_crossing_person_threshold:
                 state_manager.reset_crossing() # Reset crossing state if no person detected for a while
 
             if LOG_MODE:
