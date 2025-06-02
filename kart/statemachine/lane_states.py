@@ -29,19 +29,19 @@ class Straight(LaneState):
 class Left(LaneState):
     def act(self, controller):
         controller.steer(-0.65)
-        controller.drive(70)
+        controller.drive(60)
 
 class Right(LaneState):
     def act(self, controller):
         controller.steer(0.65)
-        controller.drive(30)
+        controller.drive(60)
 
 class SharpLeft(LaneState):
     def act(self, controller):
         controller.steer(-1.2)
-        controller.drive(70)
+        controller.drive(60)
 
 class SharpRight(LaneState):
     def act(self, controller):
         controller.steer(1.2)
-        controller.drive(30)
+        controller.drive(60)
