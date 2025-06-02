@@ -86,8 +86,9 @@ def main(source: str, is_camera: bool = False):
                 detections = detect_objects(small_frame, size_scale)
                 for label, conf, (x1, y1), (x2, y2) in detections:
                     logging.info(f"OBJECT: {label} | coords: ({x1},{y1}), ({x2},{y2})")
-                    cv2.rectangle(combined_frame, (x1, y1), (x2, y2), (0, 50, 150), 2)
-                    cv2.putText(combined_frame, f"{label} {conf:.2f}", (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 50, 150), 2)
+                    if DEBUG_MODE:
+                        cv2.rectangle(combined_frame, (x1, y1), (x2, y2), (0, 50, 150), 2)
+                        cv2.putText(combined_frame, f"{label} {conf:.2f}", (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 50, 150), 2)
 
                     if label == 'zebra-crossing':
                         crossbox_position = [x1, y1, x2, y2]
