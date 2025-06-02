@@ -43,5 +43,11 @@ class MasterStateManager:
     def reset_crossing(self):
         self.cross_manager.reset()
 
+    def alreadycrossed(self):
+        self.cross_manager.alreadycrossed()
+
+    def waiting(self):
+        return self.cross_manager.waiting()
+
     def crossed(self):
         return self.cross_manager.crossed()
