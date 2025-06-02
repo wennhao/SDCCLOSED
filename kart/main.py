@@ -44,7 +44,7 @@ def main(source: str, is_camera: bool = False):
         return
 
     frame_count = 0
-    no_crossing_person = 0
+    no_crossing_person_counter = 0
 
     try:
         while True:
