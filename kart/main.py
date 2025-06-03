@@ -32,11 +32,12 @@ right_camera_index = 4
 size_scale = 0.6 if DEBUG_MODE else 1.0
 frame_skip = 10
 object_detection_interval = 5
-no_crossing_person_threshold = 50
 
+no_crossing_person_threshold = 100
 frames_after_left_turn_threshold = 15
-
-ready_to_cross_counter_threshold = 50
+ready_to_cross_counter_threshold = 500
+stop_sign_wait_for = 200
+stop_sign_ignore_for = 50
 
 def initialize_can():
     if DEBUG_MODE:
@@ -66,6 +67,11 @@ def main(source: str, is_camera: bool = False):
 
     ready_to_cross_counter = 0
 
+    stop_sign_state = False
+    stop_sign_counter = 0
+    stop_sign_ignore_state = False
+    stop_sign_ignore_counter = 0
+
     try:
         while True:
             """
@@ -82,6 +88,17 @@ def main(source: str, is_camera: bool = False):
 
             small_frame = cv2.resize(frame, (0, 0), fx=size_scale, fy=size_scale)
             steering_cmd, lane_debug = None, None
+
+            """
+            LANE DETECTION
+            This section processes the frame for lane detection and returns the steering command.
+            """
+            if not DISABLE_LANE_DETECTION:
+                steering_cmd, lane_debug = process_frame(small_frame.copy(), "LEFT" if left_turn_state else "RIGHT")
+
+                combined_frame = lane_debug.copy()
+            else:
+                combined_frame = small_frame.copy()
 
             """
             OBJECT DETECTION
@@ -112,35 +129,44 @@ def main(source: str, is_camera: bool = False):
                     elif label == 'one-way-left' or label == 'sign-left-only':
                         left_turn_sign = True
                         left_turn_state = True
+                    elif label == 'stop-sign':
+                        stop_sign_state = True
 
                 if not left_turn_sign:
                     frames_after_left_turn += 1
+                    if frames_after_left_turn > frames_after_left_turn_threshold:
+                        left_turn_state = False
                 else:
                     frames_after_left_turn = 0
 
-                if frames_after_left_turn > frames_after_left_turn_threshold:
-                    left_turn_state = False
-
                 if not manbox_position or not crossbox_position or state_manager.crossed():
                     no_crossing_person_counter += 1
+                    if no_crossing_person_counter > no_crossing_person_threshold:
+                        state_manager.reset_crossing() # Reset crossing state if no person detected for a while
                 else:
                     no_crossing_person_counter = 0
 
                 if state_manager.waiting():
                     ready_to_cross_counter += 1
+                    if ready_to_cross_counter > ready_to_cross_counter_threshold:
+                        state_manager.alreadycrossed() # If the person for some reason is just waiting near the crosswalk. It will ignore for <no_crossing_person_threshold> frames
                 else:
                     ready_to_cross_counter = 0
 
-            """
-            LANE DETECTION
-            This section processes the frame for lane detection and returns the steering command.
-            """
-            if not DISABLE_LANE_DETECTION:
-                steering_cmd, lane_debug = process_frame(small_frame.copy(), "LEFT" if left_turn_state else "RIGHT")
+                if stop_sign_state:
+                    stop_sign_counter += 1
+                    if stop_sign_counter > stop_sign_wait_for and not stop_sign_ignore_state: # Keeps counting, so delay is just ignore_for
+                        stop_sign_state = False
+                        stop_sign_ignore_state = True
+                else:
+                    stop_sign_counter = 0
 
-                combined_frame = lane_debug.copy()
-            else:
-                combined_frame = small_frame.copy()       
+                if stop_sign_ignore_state:
+                    stop_sign_ignore_counter += 1
+                    if stop_sign_ignore_counter > stop_sign_ignore_for:
+                        stop_sign_ignore_state = False
+                else:
+                    stop_sign_ignore_counter = 0
 
             # Display the frame with detected objects and lane markings
             if SHOW_VIDEO:
@@ -156,21 +182,18 @@ def main(source: str, is_camera: bool = False):
                 manbox_position, 
                 crossbox_position, 
                 detected_red, 
-                detected_green
+                detected_green,
+                stop_sign_state
             )
 
             lane_state_obj = state_info['lane_state'] # Gets the current lane state object e.g. Searching, Straight, Left, Right, SharpLeft, SharpRight
             override = state_info['override'] # True if crossing or traffic light state requires override
 
-            if no_crossing_person_counter > no_crossing_person_threshold:
-                state_manager.reset_crossing() # Reset crossing state if no person detected for a while
-            if ready_to_cross_counter > ready_to_cross_counter_threshold:
-                state_manager.alreadycrossed() # If the person for some reason is just waiting near the crosswalk. It will ignore for <no_crossing_person_threshold> frames
-
             if LOG_MODE:
                 logging.info(f"Lane: {lane_state_obj.__class__.__name__}, Override: {override}")
                 logging.info(f"Crossing State: {state_manager.cross_manager.state}")
                 logging.info(f"Traffic Light State: {state_manager.traffic_manager.state}")
+                logging.info(f"Left Turn State: {left_turn_state}")
                 logging.info(override)
 
             if override: # override happens due to crossing or traffic light
