@@ -15,7 +15,7 @@ IMIN = 0     # min intensity for potential future use
 IMAX = 50    # max intensity for potential future use
 
 FRONT_THRESH = 500
-RIGHT_THRESH = 500
+RIGHT_THRESH = 500 # 50 cm
 LEFT_THRESH = 500
 
 
