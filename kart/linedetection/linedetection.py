@@ -27,12 +27,8 @@ def process_frame(frame, direction):
 
     edges = cv2.Canny(grayscale, 70, 200)
 
-    height, width = edges.shapex
+    height, width = edges.shape
     y_norm = int(height / 2)
-    # x_norm = int(540/840 * width)
-    # roi_border = width // 8 * 3
-
-    # region_vertices = [(roi_border, 0), (width, 0), (width, height), (roi_border, height)]
 
     if direction == "RIGHT":
         x_norm = int(540/848 * width)
@@ -43,7 +39,7 @@ def process_frame(frame, direction):
     elif direction == "LEFT":
         x_norm = int(540/848 * width - 0.5*width)
 
-        roi_border_x = int(width / 8 * 3 + 0.5*width)
+        roi_border_x = int(width / 8 * 5)
         region_vertices = [(roi_border_x, 0), (0, 0), (0, height), (roi_border_x, height)] # linkerkant
 
     

@@ -8,6 +8,7 @@ from linedetection.linedetection import process_frame # Function
 from objectdetection.objectdetection import detect_objects # Function
 from carcontroller import CarController # Class
 from statemachine.master_state_manager import MasterStateManager # Class
+from initcameras.initializecameras import initialize_cameras
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s')
@@ -20,6 +21,14 @@ DISABLE_LANE_DETECTION = False
 LOG_MODE = True
 
 # Variables
+"""
+#waardes zijn wss verkeerd
+front_camera_index = 0
+left_camera_index = 2
+right_camera_index = 4
+#nog niks mee gedaan
+""" 
+
 size_scale = 0.6 if DEBUG_MODE else 1.0
 frame_skip = 10
 object_detection_interval = 5
@@ -44,6 +53,10 @@ def main(source: str, is_camera: bool = False):
     if not cap.isOpened():
         print(f"Error: Could not open {'camera' if is_camera else 'video file'}: {source}")
         return
+    """
+    cameras = initialize_cameras()
+    # cameras["front"], cameras["left"], cameras["right"]
+    """
 
     frame_count = 0
     no_crossing_person_counter = 0
