@@ -4,5 +4,5 @@ opencv-python==4.11.0.86
 ultralytics==8.3.89
 python-can==4.5.0
 roboflow==1.1.58
-rplidar==0.9.2
+rplidar-roboticia==0.9.5
 matplotlib~=3.5.1

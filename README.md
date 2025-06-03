@@ -65,6 +65,9 @@ To view all ports run
 python3 -m serial.tools.list_ports
 ```
 
+LiDAR requires you to install rplidar-roboticia
+if you installed rplidar, please uninstall as it would break the LiDAR sensor
+
 ## Running on the kart
 Change to the file you want to run, use python3 `file_name.py` to run the file on the kart
 
