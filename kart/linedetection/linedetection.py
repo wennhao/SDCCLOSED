@@ -27,7 +27,7 @@ def process_frame(frame, direction):
 
     edges = cv2.Canny(grayscale, 70, 200)
 
-    height, width = edges.shapex
+    height, width = edges.shape
     y_norm = int(height / 2)
     # x_norm = int(540/840 * width)
     # roi_border = width // 8 * 3

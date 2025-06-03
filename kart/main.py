@@ -77,6 +77,17 @@ def main(source: str, is_camera: bool = False):
             steering_cmd, lane_debug = None, None
 
             """
+            LANE DETECTION
+            This section processes the frame for lane detection and returns the steering command.
+            """
+            if not DISABLE_LANE_DETECTION:
+                steering_cmd, lane_debug = process_frame(small_frame.copy(), "LEFT" if left_turn_state else "RIGHT")
+
+                combined_frame = lane_debug.copy()
+            else:
+                combined_frame = small_frame.copy()
+
+            """
             OBJECT DETECTION
             This section detects objects in the frame and updates the state manager with the detected objects.
             """
@@ -144,17 +155,6 @@ def main(source: str, is_camera: bool = False):
                 else:
                     stop_sign_ignore_counter = 0
 
-            """
-            LANE DETECTION
-            This section processes the frame for lane detection and returns the steering command.
-            """
-            if not DISABLE_LANE_DETECTION:
-                steering_cmd, lane_debug = process_frame(small_frame.copy(), "LEFT" if left_turn_state else "RIGHT")
-
-                combined_frame = lane_debug.copy()
-            else:
-                combined_frame = small_frame.copy()       
-
             # Display the frame with detected objects and lane markings
             if SHOW_VIDEO:
                 cv2.imshow("Combined View", combined_frame)
@@ -180,6 +180,7 @@ def main(source: str, is_camera: bool = False):
                 logging.info(f"Lane: {lane_state_obj.__class__.__name__}, Override: {override}")
                 logging.info(f"Crossing State: {state_manager.cross_manager.state}")
                 logging.info(f"Traffic Light State: {state_manager.traffic_manager.state}")
+                logging.info(f"Left Turn State: {left_turn_state}")
                 logging.info(override)
 
             if override: # override happens due to crossing or traffic light

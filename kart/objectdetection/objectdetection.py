@@ -17,7 +17,7 @@ detected_objects = {
 }
 objects_size = {
     "car": 7000,
-    "one-way-left": 1200,
+    "one-way-left": 900,
     "sign-left-only": 1200,
     "speed-sign-20": 1500, 
     "speed-sign-30": 1000,
