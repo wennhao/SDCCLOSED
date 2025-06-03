@@ -9,16 +9,22 @@ from objectdetection.objectdetection import detect_objects # Function
 from carcontroller import CarController # Class
 from statemachine.master_state_manager import MasterStateManager # Class
 
+# Lidar
+from lidar.lidar_detection import LidarDetector # Class
+
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s')
 
 # Constants
 DEBUG_MODE = True
 SHOW_VIDEO = True
-DISABLE_OBJECT_DETECTION = False
-DISABLE_LANE_DETECTION = False
-LOG_MODE = True
+DISABLE_OBJECT_DETECTION = True
+DISABLE_LANE_DETECTION = True
+DISABLE_LIDAR = False
+LOG_MODE = False
+LINUX_MODE = True
 
+lidar_port = '/dev/cu.usbserial-0001' if LINUX_MODE else 'com4' # Adjust port based on OS
 # Variables
 size_scale = 0.6 if DEBUG_MODE else 1.0
 frame_skip = 10
@@ -37,6 +43,10 @@ def main(source: str, is_camera: bool = False):
     bus = initialize_can()
     controller = CarController(bus, debug=DEBUG_MODE)
     state_manager = MasterStateManager()
+
+    # Initialize Lidar Detector
+    lidar_detector = LidarDetector(port=lidar_port, baudrate=115200, timeout=1, front_thresh=500, left_thresh=500, right_thresh=500, debug=DEBUG_MODE)
+    lidar_detector.start()  # Start the Lidar thread
 
     cap = cv2.VideoCapture(int(source) if is_camera else source)
     if not cap.isOpened():
@@ -62,8 +72,19 @@ def main(source: str, is_camera: bool = False):
 
             small_frame = cv2.resize(frame, (0, 0), fx=size_scale, fy=size_scale)
             steering_cmd, lane_debug = None, None
-
             """
+            LIDAR DETECTION
+            This section checks the Lidar for obstacles and updates the state manager accordingly.
+            """
+            if not DISABLE_LIDAR:
+                front_obs, left_obs, right_obs = lidar_detector.get_obstacles()
+
+                if front_obs:
+                    logging.warning("LIDAR: Obstacle detected in front!")
+                    override = True
+                    controller.stop()
+            """
+            
             LANE DETECTION
             This section processes the frame for lane detection and returns the steering command.
             """
@@ -144,8 +165,10 @@ def main(source: str, is_camera: bool = False):
     finally:
         controller.steer(0.0) # Reset steering, because the kart breaks when stopped while wheels are turned
         cap.release()
+        lidar_detector.stop()
         cv2.destroyAllWindows()
         bus.shutdown()
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Run lane and object detection')

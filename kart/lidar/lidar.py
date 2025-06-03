@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import sys
 from os import path
 from platform import system
@@ -7,8 +5,8 @@ import numpy as np
 from rplidar import RPLidar
 
 # --- CONFIG ---
-LIDAR_PORT = 'com4'
-BAUDRATE = 115200
+LIDAR_PORT = '/dev/cu.usbserial-0001'
+BAUDRATE = 256000
 TIMEOUT = 1
 DMAX = 4000  # max distance for potential future use
 IMIN = 0     # min intensity for potential future use
