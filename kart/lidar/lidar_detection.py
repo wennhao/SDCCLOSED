@@ -78,7 +78,7 @@ class LidarDetector(threading.Thread):
         self.running = False
 
     def process_scan(self, scan):
-        front = left = right = 0
+        front = left = right = 0.0
 
         for _, angle, distance in scan:
             if 165 < angle < 195:

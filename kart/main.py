@@ -8,7 +8,7 @@ from linedetection.linedetection import process_frame # Function
 from objectdetection.objectdetection import detect_objects # Function
 from carcontroller import CarController # Class
 from statemachine.master_state_manager import MasterStateManager # Class
-from initcameras.initializecameras import initialize_cameras
+# from initcameras.initializecameras import initialize_cameras
 
 # Lidar
 from lidar.lidar_detection import LidarDetector # Class
@@ -38,7 +38,6 @@ stop_sign_wait_for = 200
 stop_sign_ignore_for = 50
 
 lidar_front_crash_prevention_distance = 500
-lidar_car_detection_distance = 1000
 
 def initialize_can():
     if DEBUG_MODE:
@@ -52,7 +51,7 @@ def main(source: str, is_camera: bool = False):
     state_manager = MasterStateManager()
 
     # Initialize Lidar Detector
-    lidar_detector = LidarDetector(port=lidar_port, baudrate=115200, timeout=1, front_thresh=500, left_thresh=500, right_thresh=500, debug=DEBUG_MODE)
+    lidar_detector = LidarDetector(port=lidar_port, baudrate=115200, timeout=1, debug=DEBUG_MODE)
     lidar_detector.start()  # Start the Lidar thread
 
     cap = cv2.VideoCapture(int(source) if is_camera else source)
@@ -99,6 +98,7 @@ def main(source: str, is_camera: bool = False):
             """
             if not DISABLE_LIDAR:
                 front_dist, left_dist, right_dist = lidar_detector.get_obstacles()
+                print(f"LIDAR: {front_dist}, {left_dist}, {right_dist}")
 
                 if front_dist < lidar_front_crash_prevention_distance:
                     logging.warning("LIDAR: Obstacle detected in front!")
@@ -201,7 +201,9 @@ def main(source: str, is_camera: bool = False):
                 crossbox_position, 
                 detected_red, 
                 detected_green,
-                stop_sign_state
+                stop_sign_state,
+                True,#detected_car,
+                front_dist, left_dist, right_dist
             )
 
             lane_state_obj = state_info['lane_state'] # Gets the current lane state object e.g. Searching, Straight, Left, Right, SharpLeft, SharpRight
@@ -212,6 +214,7 @@ def main(source: str, is_camera: bool = False):
                 logging.info(f"Crossing State: {state_manager.cross_manager.state}")
                 logging.info(f"Traffic Light State: {state_manager.traffic_manager.state}")
                 logging.info(f"Left Turn State: {left_turn_state}")
+                logging.info(f"COM: {state_info['com_state']}")
                 logging.info(override)
 
             if override: # override happens due to crossing or traffic light

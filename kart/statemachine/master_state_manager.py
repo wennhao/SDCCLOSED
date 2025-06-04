@@ -2,6 +2,7 @@ from statemachine.lane_states import *
 from statemachine.cross_states import CrossManager
 from statemachine.trafficlight_states import TrafficLightManager, TrafficLightState
 from statemachine.carobstacle_states import CarObstacleManager, CarObstacleState
+
 class MasterStateManager:
     def __init__(self):
         self.cross_manager = CrossManager()
@@ -24,37 +25,34 @@ class MasterStateManager:
                 self.lane_state = SharpRight()
             case _:
                 self.lane_state = Searching()
-
-    def update_car_obstacle_state(self, detected_car: bool):
-        if detected_car:
-            self.car_obstacle_manager.state = CarObstacleState.DETECTED
-        else:
-            self.car_obstacle_manager.state = CarObstacleState.NOT_DETECTED
-
-        match     
+    
 
     def update(self, steering_cmd, 
-               manbox, 
-               crossbox, 
-               detected_red: bool, 
-               detected_green: bool, 
-               stop_sign_state: bool, 
-               detected_car: bool):
+                manbox, 
+                crossbox, 
+                detected_red: bool, 
+                detected_green: bool, 
+                stop_sign_state: bool, 
+                detected_car: bool,
+                front_dist, left_dist, right_dist):
+        
         self.update_lane_state(steering_cmd)
-        self.update_car_obstacle_state(detected_car)
 
         crossing_override = self.cross_manager.update(manbox, crossbox)
         
         self.traffic_manager.update(detected_red, detected_green)
         traffic_override = self.traffic_manager.is_red()
 
+        com_state = self.car_obstacle_manager.update(detected_car, front_dist, left_dist, right_dist)
+
         self.override = crossing_override or traffic_override or stop_sign_state
 
         return {
             'lane_state': self.lane_state,
-            'car_obstacle_state': self.car_obstacle_state,
+            #'car_obstacle_state': self.car_obstacle_state,
             'override': self.override,
-            'traffic_state': self.traffic_manager.state
+            'traffic_state': self.traffic_manager.state,
+            'com_state': self.car_obstacle_manager.state
         }
 
     def reset_crossing(self):
