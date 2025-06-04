@@ -20,12 +20,12 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(me
 DEBUG_MODE = True
 SHOW_VIDEO = False
 DISABLE_OBJECT_DETECTION = True
-DISABLE_LANE_DETECTION = False
+DISABLE_LANE_DETECTION = True
 DISABLE_LIDAR = False
 LOG_MODE = True
-LINUX_MODE = True
+LINUX_MODE = False
 
-lidar_port = '/dev/ttyUSB0' if LINUX_MODE else 'com4' # Adjust port based on OS
+lidar_port = '/dev/ttyUSB0' if LINUX_MODE else 'com6' # Adjust port based on OS
 # Variables
 size_scale = 0.6 if DEBUG_MODE else 1.0
 frame_skip = 10
@@ -36,6 +36,9 @@ frames_after_left_turn_threshold = 15
 ready_to_cross_counter_threshold = 500
 stop_sign_wait_for = 200
 stop_sign_ignore_for = 50
+
+lidar_front_crash_prevention_distance = 500
+lidar_car_detection_distance = 1000
 
 def initialize_can():
     if DEBUG_MODE:
@@ -95,12 +98,11 @@ def main(source: str, is_camera: bool = False):
             This section checks the Lidar for obstacles and updates the state manager accordingly.
             """
             if not DISABLE_LIDAR:
-                front_obs, left_obs, right_obs = lidar_detector.get_obstacles()
+                front_dist, left_dist, right_dist = lidar_detector.get_obstacles()
 
-                if front_obs:
+                if front_dist < lidar_front_crash_prevention_distance:
                     logging.warning("LIDAR: Obstacle detected in front!")
                     override = True
-                    controller.stop()
             """
             
             LANE DETECTION
@@ -122,6 +124,7 @@ def main(source: str, is_camera: bool = False):
             detected_red = False
             detected_green = False
             left_turn_sign = False
+            detected_car = False
 
             if not DISABLE_OBJECT_DETECTION and frame_count % object_detection_interval == 0:
                 detections = detect_objects(small_frame, size_scale)
@@ -144,6 +147,8 @@ def main(source: str, is_camera: bool = False):
                         left_turn_state = True
                     elif label == 'stop-sign':
                         stop_sign_state = True
+                    elif label == 'car':
+                        detected_car = True
 
                 if not left_turn_sign:
                     frames_after_left_turn += 1
@@ -200,7 +205,7 @@ def main(source: str, is_camera: bool = False):
             )
 
             lane_state_obj = state_info['lane_state'] # Gets the current lane state object e.g. Searching, Straight, Left, Right, SharpLeft, SharpRight
-            override = state_info['override'] # True if crossing or traffic light state requires override
+            override = override or state_info['override'] # True if crossing or traffic light state requires override or crash prevention
 
             if LOG_MODE:
                 logging.info(f"Lane: {lane_state_obj.__class__.__name__}, Override: {override}")

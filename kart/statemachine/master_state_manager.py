@@ -1,12 +1,13 @@
 from statemachine.lane_states import *
 from statemachine.cross_states import CrossManager
 from statemachine.trafficlight_states import TrafficLightManager, TrafficLightState
-
+from statemachine.carobstacle_states import CarObstacleManager, CarObstacleState
 class MasterStateManager:
     def __init__(self):
         self.cross_manager = CrossManager()
         self.lane_state: LaneState = Searching()
         self.traffic_manager = TrafficLightManager()
+        self.car_obstacle_manager = CarObstacleManager()
         self.override = False
 
     def update_lane_state(self, steering_cmd):
@@ -24,8 +25,23 @@ class MasterStateManager:
             case _:
                 self.lane_state = Searching()
 
-    def update(self, steering_cmd, manbox, crossbox, detected_red: bool, detected_green: bool, stop_sign_state: bool):
+    def update_car_obstacle_state(self, detected_car: bool):
+        if detected_car:
+            self.car_obstacle_manager.state = CarObstacleState.DETECTED
+        else:
+            self.car_obstacle_manager.state = CarObstacleState.NOT_DETECTED
+
+        match     
+
+    def update(self, steering_cmd, 
+               manbox, 
+               crossbox, 
+               detected_red: bool, 
+               detected_green: bool, 
+               stop_sign_state: bool, 
+               detected_car: bool):
         self.update_lane_state(steering_cmd)
+        self.update_car_obstacle_state(detected_car)
 
         crossing_override = self.cross_manager.update(manbox, crossbox)
         
@@ -36,6 +52,7 @@ class MasterStateManager:
 
         return {
             'lane_state': self.lane_state,
+            'car_obstacle_state': self.car_obstacle_state,
             'override': self.override,
             'traffic_state': self.traffic_manager.state
         }

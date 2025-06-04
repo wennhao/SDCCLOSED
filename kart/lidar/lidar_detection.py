@@ -5,7 +5,7 @@ import sys
 import time
 
 class LidarDetector(threading.Thread):
-    def __init__(self, port='com4', baudrate=115200, timeout=1, front_thresh=500, left_thresh=500, right_thresh=500, debug=False):
+    def __init__(self, port='com6', baudrate=115200, timeout=1, debug=False):
         super().__init__()
         self.daemon = True
         self.running = False
@@ -14,13 +14,9 @@ class LidarDetector(threading.Thread):
         self.baudrate = baudrate
         self.timeout = timeout
 
-        self.front_thresh = front_thresh
-        self.left_thresh = left_thresh
-        self.right_thresh = right_thresh
-
-        self.front = False
-        self.left = False
-        self.right = False
+        self.front = 0
+        self.left = 0
+        self.right = 0
         self.debug = debug
 
         self.lidar = None
@@ -82,18 +78,15 @@ class LidarDetector(threading.Thread):
         self.running = False
 
     def process_scan(self, scan):
-        front = left = right = False
+        front = left = right = 0
 
         for _, angle, distance in scan:
             if 165 < angle < 195:
-                if distance < self.front_thresh:
-                    front = True
+                front = distance
             elif 15 < angle < 90:
-                if distance < self.left_thresh:
-                    left = True
+                left = distance
             elif 270 < angle < 345:
-                if distance < self.right_thresh:
-                    right = True
+                right = distance
 
         self.front = front
         self.left = left
