@@ -85,7 +85,7 @@ class LidarDetector(threading.Thread):
         front = left = right = False
 
         for _, angle, distance in scan:
-            if angle <= 15 or angle >= 345:
+            if 165 < angle < 195:
                 if distance < self.front_thresh:
                     front = True
             elif 15 < angle < 90:

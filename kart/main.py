@@ -17,14 +17,14 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(me
 
 # Constants
 DEBUG_MODE = True
-SHOW_VIDEO = True
+SHOW_VIDEO = False
 DISABLE_OBJECT_DETECTION = True
-DISABLE_LANE_DETECTION = True
+DISABLE_LANE_DETECTION = False
 DISABLE_LIDAR = False
-LOG_MODE = False
+LOG_MODE = True
 LINUX_MODE = True
 
-lidar_port = '/dev/cu.usbserial-0001' if LINUX_MODE else 'com4' # Adjust port based on OS
+lidar_port = '/dev/ttyUSB0' if LINUX_MODE else 'com4' # Adjust port based on OS
 # Variables
 size_scale = 0.6 if DEBUG_MODE else 1.0
 frame_skip = 10

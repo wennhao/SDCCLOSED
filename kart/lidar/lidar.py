@@ -5,8 +5,8 @@ import numpy as np
 from rplidar import RPLidar
 
 # --- CONFIG ---
-LIDAR_PORT = '/dev/cu.usbserial-0001'
-BAUDRATE = 256000
+LIDAR_PORT = '/dev/ttyUSB0'
+BAUDRATE = 115200 #256000
 TIMEOUT = 1
 DMAX = 4000  # max distance for potential future use
 IMIN = 0     # min intensity for potential future use
@@ -24,8 +24,8 @@ def detect_objects(scan):
     detected_right = False
 
     for _, angle, distance in scan:
-        # Front: angle <= 15° or >= 345°
-        if angle <= 15 or angle >= 345:
+        # Front: angle <= 195° or >= 165°
+        if 165 < angle < 195:
             if distance < FRONT_THRESH:
                 detected_front = True
         # Front-left: 15° < angle < 90°
@@ -58,8 +58,8 @@ def run():
 
             if front:
                 print("Warning: Object detected in front within 50 cm!")
-            # if left:
-            #     print("Warning: Object detected on the left within 50 cm!")
+            if left:
+               print("Warning: Object detected on the left within 50 cm!")
             # if right:
             #     print("Warning: Object detected on the right within 50 cm!")
             else:
