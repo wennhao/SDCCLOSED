@@ -35,6 +35,12 @@ class CrossManager:
 
     def reset(self):
         self.state = CrossStateEnum.SEARCHING
+    
+    def alreadycrossed(self):
+        self.state = CrossStateEnum.CROSSED
+
+    def waiting(self):
+        return self.state == CrossStateEnum.READYTOCROSS
 
     def crossed(self):
         return self.state == CrossStateEnum.CROSSED

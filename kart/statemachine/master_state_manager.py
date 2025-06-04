@@ -24,7 +24,7 @@ class MasterStateManager:
             case _:
                 self.lane_state = Searching()
 
-    def update(self, steering_cmd, manbox, crossbox, detected_red: bool, detected_green: bool):
+    def update(self, steering_cmd, manbox, crossbox, detected_red: bool, detected_green: bool, stop_sign_state: bool):
         self.update_lane_state(steering_cmd)
 
         crossing_override = self.cross_manager.update(manbox, crossbox)
@@ -32,7 +32,7 @@ class MasterStateManager:
         self.traffic_manager.update(detected_red, detected_green)
         traffic_override = self.traffic_manager.is_red()
 
-        self.override = crossing_override or traffic_override
+        self.override = crossing_override or traffic_override or stop_sign_state
 
         return {
             'lane_state': self.lane_state,
@@ -42,6 +42,12 @@ class MasterStateManager:
 
     def reset_crossing(self):
         self.cross_manager.reset()
+
+    def alreadycrossed(self):
+        self.cross_manager.alreadycrossed()
+
+    def waiting(self):
+        return self.cross_manager.waiting()
 
     def crossed(self):
         return self.cross_manager.crossed()
