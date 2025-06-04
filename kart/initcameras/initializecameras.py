@@ -1,3 +1,5 @@
+# credits RDW 2025
+
 import sys
 import cv2
 import video
@@ -18,7 +20,7 @@ def initialize_cameras() -> Dict[str, cv2.VideoCapture]:
         capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
         capture.set(cv2.CAP_PROP_AUTOFOCUS, 0)
         capture.set(cv2.CAP_PROP_FOCUS, 0)
-        capture.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*'MJPG')) #important to set right codec to enable 60fps
-        capture.set(cv2.CAP_PROP_FPS, 30) #make 60 to enable 60FPS
+        capture.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*'MJPG'))
+        capture.set(cv2.CAP_PROP_FPS, 30)
         cameras[camera_type] = capture
     return cameras

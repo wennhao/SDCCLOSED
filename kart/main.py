@@ -21,14 +21,6 @@ DISABLE_LANE_DETECTION = False
 LOG_MODE = True
 
 # Variables
-"""
-#waardes zijn wss verkeerd
-front_camera_index = 0
-left_camera_index = 2
-right_camera_index = 4
-#nog niks mee gedaan
-""" 
-
 size_scale = 0.6 if DEBUG_MODE else 1.0
 frame_skip = 10
 object_detection_interval = 5
