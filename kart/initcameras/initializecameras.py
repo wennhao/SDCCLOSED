@@ -2,7 +2,7 @@
 
 import sys
 import cv2
-import video
+from . import video
 from typing import Dict
 
 def initialize_cameras() -> Dict[str, cv2.VideoCapture]:

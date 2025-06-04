@@ -42,14 +42,16 @@ def main(source: str, is_camera: bool = False):
     controller = CarController(bus, debug=DEBUG_MODE)
     state_manager = MasterStateManager()
 
-    cap = cv2.VideoCapture(int(source) if is_camera else source)
-    if not cap.isOpened():
-        print(f"Error: Could not open {'camera' if is_camera else 'video file'}: {source}")
-        return
-    """
-    cameras = initialize_cameras()
-    # cameras["front"], cameras["left"], cameras["right"]
-    """
+    if DEBUG_MODE:
+        cap = cv2.VideoCapture(int(source) if is_camera else source)
+        if not cap.isOpened():
+            print(f"Error: Could not open {'camera' if is_camera else 'video file'}: {source}")
+            return
+    else:
+        cameras = initialize_cameras()
+        front_camera = cameras["front"]
+        left_camera = cameras["left"]
+        right_camera = cameras["right"]
 
     frame_count = 0
     no_crossing_person_counter = 0
@@ -70,9 +72,20 @@ def main(source: str, is_camera: bool = False):
             FRAME PROCESSING
             Video Capture setup and frame reading.
             """
-            ret, frame = cap.read()
-            if not ret:
-                break
+            if DEBUG_MODE:
+                ret, frame = cap.read()
+                if not ret:
+                    break
+                left_camera_frame = frame.copy()
+                right_camera_frame = frame.copy()
+            else:
+                retl, left_camera_frame = left_camera.read()
+                retf, frame = front_camera.read()
+                retr, right_camera_frame = right_camera.read()
+            
+                if not retl or not retf or not retr:
+                    logging.error("Failed to read from one or more cameras")
+                    break
 
             frame_count += 1
             if frame_count % frame_skip != 0:
@@ -86,7 +99,11 @@ def main(source: str, is_camera: bool = False):
             This section processes the frame for lane detection and returns the steering command.
             """
             if not DISABLE_LANE_DETECTION:
-                steering_cmd, lane_debug = process_frame(small_frame.copy(), "LEFT" if left_turn_state else "RIGHT")
+                if left_turn_state:
+                    steering_cmd, lane_debug = process_frame(left_camera_frame, "LEFT")
+                else:
+                    steering_cmd, lane_debug = process_frame(right_camera_frame, "RIGHT")
+
 
                 combined_frame = lane_debug.copy()
             else:
@@ -198,13 +215,25 @@ def main(source: str, is_camera: bool = False):
 
     finally:
         controller.steer(0.0) # Reset steering, because the kart breaks when stopped while wheels are turned
-        cap.release()
+        if DEBUG_MODE:
+            cap.release()
+        else:
+            front_camera.release()
+            left_camera.release()
+            right_camera.release()
         cv2.destroyAllWindows()
         bus.shutdown()
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Run lane and object detection')
-    parser.add_argument('source', help='Video file path or camera index')
-    parser.add_argument('--camera', action='store_true', help='Use camera')
+    parser.add_argument('source', help='Video file path or "true" to use camera')
+    #parser.add_argument('--camera', action='store_true', help='Use camera')
     args = parser.parse_args()
-    main(args.source, is_camera=args.camera)
+    
+    use_cameras = False
+    if args.source.lower() == "true":
+        use_cameras = True
+        source = 0
+    else: 
+        source = args.source
+    main(source, is_camera=use_cameras)
