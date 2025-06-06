@@ -18,7 +18,7 @@ class LaneState(ABC):
 
 class Searching(LaneState):
     def act(self, controller):
-        controller.steer(0.2)
+        controller.steer(0.0)
         controller.drive(20)
 
 class Straight(LaneState):
