@@ -24,64 +24,30 @@ class CarObstacleManager():
         if self.state == CarObstacleStateEnum.SEARCHING and detected_car and dist_front < front_detection_distance:
             self.state = CarObstacleStateEnum.OVERTAKING_LEFT
             self.counter = 0
-            return "COM: searching"
+            return "overtaking left"
         elif self.state == CarObstacleStateEnum.OVERTAKING_LEFT:
             self.counter += 1
-            print("COM: overtaking left")
             if self.counter > steer_frame_amount:
                 self.state = CarObstacleStateEnum.OVERTAKING_STRAIGHT
                 self.counter = 0
+            return "overtaking left"
         elif self.state == CarObstacleStateEnum.OVERTAKING_STRAIGHT:
             if dist_right > right_detection_distance:
                 self.counter += 1
                 if self.counter > straight_frame_amount:
                     self.state = CarObstacleStateEnum.OVERTAKING_RIGHT
                     self.counter = 0
-            return "COM: overtaking straight"
+            return False
         elif self.state == CarObstacleStateEnum.OVERTAKING_RIGHT:
             self.counter += 1
             if self.counter > steer_frame_amount:
                 self.state = CarObstacleStateEnum.OVERTAKEN
                 self.counter = 0
-            return "COM: overtaking right"
+            return "overtaking right"
         elif self.state == CarObstacleStateEnum.OVERTAKEN:
             self.state = CarObstacleStateEnum.SEARCHING
-            return "COM: overtaken"
+            return False
+        return False
     
     def overtaking(self):
         return self.state == CarObstacleStateEnum.OVERTAKING_LEFT or self.state == CarObstacleStateEnum.OVERTAKING_STRAIGHT or self.state == CarObstacleStateEnum.OVERTAKING_RIGHT
-
-
-class CarObstacleState(ABC):
-    @abstractmethod
-    def act(self, controller):
-        pass
-
-def PreventCrash(CarObstacleState):
-    def act(self, controller):
-        controller.stop() # Stop the kart to prevent collision
-
-def Searching(CarObstacleState):
-    def act(self, controller):
-        controller.steer(0.2)
-        controller.drive(20)
-
-def Detected(CarObstacleState):
-    def act(self, controller):
-        controller.steer(0.0)
-        controller.drive(0)  # Stop the kart to prevent collision
-    
-def OvertakingLeft(CarObstacleState):
-    def act(self, controller):
-        controller.steer(-0.65)  # Steer to the left to overtake
-        controller.drive(60)  # Drive at a higher speed to overtake
-
-def OvertakingStraight(CarObstacleState):
-    def act(self, controller):
-        controller.steer(0.0)  # Keep the kart straight while overtaking
-        controller.drive(60)  # Drive at a higher speed to overtake
-
-def OvertakingRight(CarObstacleState):
-    def act(self, controller):
-        controller.steer(0.65)  # Keep the kart straight while overtaking
-        controller.drive(60)  # Drive at a higher speed to overtake

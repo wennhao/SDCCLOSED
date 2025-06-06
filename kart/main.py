@@ -245,7 +245,7 @@ def main(source: str, is_camera: bool = False):
                 detected_red, 
                 detected_green,
                 stop_sign_state,
-                True,#detected_car,
+                detected_car,
                 front_dist, left_dist, right_dist
             )
 
