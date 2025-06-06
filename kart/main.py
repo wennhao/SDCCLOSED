@@ -24,6 +24,7 @@ LOG_MODE = True
 size_scale = 0.6 if DEBUG_MODE else 1.0
 frame_skip = 10
 object_detection_interval = 5
+lane_detection_interval = 2
 
 no_crossing_person_threshold = 100
 frames_after_left_turn_threshold = 15
@@ -98,7 +99,7 @@ def main(source: str, is_camera: bool = False):
             LANE DETECTION
             This section processes the frame for lane detection and returns the steering command.
             """
-            if not DISABLE_LANE_DETECTION:
+            if not DISABLE_LANE_DETECTION and frame_count % lane_detection_interval == 0:
                 if left_turn_state:
                     steering_cmd, lane_debug = process_frame(left_camera_frame, "LEFT")
                 else:

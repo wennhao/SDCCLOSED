@@ -21,7 +21,7 @@ def get_y(line, x_norm):
 def process_frame(frame, direction):
     blurred = cv2.GaussianBlur(frame, (5, 5), 0)
     gray = cv2.cvtColor(blurred, cv2.COLOR_BGR2GRAY)
-    grayscale = cv2.inRange(gray, 175, 255) #150
+    grayscale = cv2.inRange(gray, 195, 255) #150
 
     edges = cv2.Canny(grayscale, 70, 200)
 
