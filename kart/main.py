@@ -179,6 +179,8 @@ def main(source: str, is_camera: bool = False):
                     elif label == 'car':
                         detected_car = True
 
+                # If one of the left turn signs is detected, set state for as long as the sign is detected + threshold frames
+                # State is used to switch camera sides
                 if not left_turn_sign:
                     frames_after_left_turn += 1
                     if frames_after_left_turn > frames_after_left_turn_threshold:
@@ -186,6 +188,8 @@ def main(source: str, is_camera: bool = False):
                 else:
                     frames_after_left_turn = 0
 
+                # If there's no person that needs to cross, increase the counter every frame
+                # If the counter reaches the threshold, reset the crossing state
                 if not manbox_position or not crossbox_position or state_manager.crossed():
                     no_crossing_person_counter += 1
                     if no_crossing_person_counter > no_crossing_person_threshold:
@@ -193,6 +197,9 @@ def main(source: str, is_camera: bool = False):
                 else:
                     no_crossing_person_counter = 0
 
+                # If kart is waiting on pedestrian to cross, increase counter every frame
+                # If counter reaches threshold, set state to crossed
+                # Next frame the above if statement would be True
                 if state_manager.waiting():
                     ready_to_cross_counter += 1
                     if ready_to_cross_counter > ready_to_cross_counter_threshold:
@@ -200,6 +207,10 @@ def main(source: str, is_camera: bool = False):
                 else:
                     ready_to_cross_counter = 0
 
+                # If stop sign is detected, increase counter every frame
+                # During stop sign, kart is stopped
+                # If counter reaches threshold, reset stop sign state and set ignore state (see next if-statement)
+                # With state reset, kart can drive again
                 if stop_sign_state:
                     stop_sign_counter += 1
                     if stop_sign_counter > stop_sign_wait_for and not stop_sign_ignore_state: # Keeps counting, so delay is just ignore_for
@@ -208,6 +219,9 @@ def main(source: str, is_camera: bool = False):
                 else:
                     stop_sign_counter = 0
 
+                # If stop sign ignore state, increase counter every frame
+                # Ignore state ignores stop sign functionality so it doesn't stay stopped forever
+                # If counter reaches threshold, reset state
                 if stop_sign_ignore_state:
                     stop_sign_ignore_counter += 1
                     if stop_sign_ignore_counter > stop_sign_ignore_for:
