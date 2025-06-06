@@ -8,7 +8,7 @@ from linedetection.linedetection import process_frame # Function
 from objectdetection.objectdetection import detect_objects # Function
 from carcontroller import CarController # Class
 from statemachine.master_state_manager import MasterStateManager # Class
-# from initcameras.initializecameras import initialize_cameras
+from initcameras.initializecameras import initialize_cameras
 
 # Lidar
 from lidar.lidar_detection import LidarDetector # Class
