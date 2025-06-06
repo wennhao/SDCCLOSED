@@ -8,18 +8,24 @@ from linedetection.linedetection import process_frame # Function
 from objectdetection.objectdetection import detect_objects # Function
 from carcontroller import CarController # Class
 from statemachine.master_state_manager import MasterStateManager # Class
-from initcameras.initializecameras import initialize_cameras
+# from initcameras.initializecameras import initialize_cameras
+
+# Lidar
+from lidar.lidar_detection import LidarDetector # Class
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s')
 
 # Constants
 DEBUG_MODE = True
-SHOW_VIDEO = True
-DISABLE_OBJECT_DETECTION = False
-DISABLE_LANE_DETECTION = False
+SHOW_VIDEO = False
+DISABLE_OBJECT_DETECTION = True
+DISABLE_LANE_DETECTION = True
+DISABLE_LIDAR = False
 LOG_MODE = True
+LINUX_MODE = False
 
+lidar_port = '/dev/ttyUSB0' if LINUX_MODE else 'com6' # Adjust port based on OS
 # Variables
 size_scale = 0.6 if DEBUG_MODE else 1.0
 frame_skip = 10
@@ -32,6 +38,8 @@ ready_to_cross_counter_threshold = 500
 stop_sign_wait_for = 200
 stop_sign_ignore_for = 50
 
+lidar_front_crash_prevention_distance = 500
+
 def initialize_can():
     if DEBUG_MODE:
         return can.Bus(interface='virtual', channel='vcan0', bitrate=500000, receive_own_messages=True)
@@ -43,6 +51,7 @@ def main(source: str, is_camera: bool = False):
     controller = CarController(bus, debug=DEBUG_MODE)
     state_manager = MasterStateManager()
 
+
     if DEBUG_MODE:
         cap = cv2.VideoCapture(int(source) if is_camera else source)
         if not cap.isOpened():
@@ -53,6 +62,20 @@ def main(source: str, is_camera: bool = False):
         front_camera = cameras["front"]
         left_camera = cameras["left"]
         right_camera = cameras["right"]
+
+    # Initialize Lidar Detector
+    lidar_detector = LidarDetector(port=lidar_port, baudrate=115200, timeout=1, debug=DEBUG_MODE)
+    lidar_detector.start()  # Start the Lidar thread
+
+    cap = cv2.VideoCapture(int(source) if is_camera else source)
+    if not cap.isOpened():
+        print(f"Error: Could not open {'camera' if is_camera else 'video file'}: {source}")
+        return
+    """
+    cameras = initialize_cameras()
+    # cameras["front"], cameras["left"], cameras["right"]
+    """
+
 
     frame_count = 0
     no_crossing_person_counter = 0
@@ -94,8 +117,19 @@ def main(source: str, is_camera: bool = False):
 
             small_frame = cv2.resize(frame, (0, 0), fx=size_scale, fy=size_scale)
             steering_cmd, lane_debug = None, None
-
             """
+            LIDAR DETECTION
+            This section checks the Lidar for obstacles and updates the state manager accordingly.
+            """
+            if not DISABLE_LIDAR:
+                front_dist, left_dist, right_dist = lidar_detector.get_obstacles()
+                print(f"LIDAR: {front_dist}, {left_dist}, {right_dist}")
+
+                if front_dist < lidar_front_crash_prevention_distance:
+                    logging.warning("LIDAR: Obstacle detected in front!")
+                    override = True
+            """
+            
             LANE DETECTION
             This section processes the frame for lane detection and returns the steering command.
             """
@@ -119,6 +153,7 @@ def main(source: str, is_camera: bool = False):
             detected_red = False
             detected_green = False
             left_turn_sign = False
+            detected_car = False
 
             if not DISABLE_OBJECT_DETECTION and frame_count % object_detection_interval == 0:
                 detections = detect_objects(small_frame, size_scale)
@@ -141,6 +176,8 @@ def main(source: str, is_camera: bool = False):
                         left_turn_state = True
                     elif label == 'stop-sign':
                         stop_sign_state = True
+                    elif label == 'car':
+                        detected_car = True
 
                 if not left_turn_sign:
                     frames_after_left_turn += 1
@@ -193,17 +230,20 @@ def main(source: str, is_camera: bool = False):
                 crossbox_position, 
                 detected_red, 
                 detected_green,
-                stop_sign_state
+                stop_sign_state,
+                True,#detected_car,
+                front_dist, left_dist, right_dist
             )
 
             lane_state_obj = state_info['lane_state'] # Gets the current lane state object e.g. Searching, Straight, Left, Right, SharpLeft, SharpRight
-            override = state_info['override'] # True if crossing or traffic light state requires override
+            override = override or state_info['override'] # True if crossing or traffic light state requires override or crash prevention
 
             if LOG_MODE:
                 logging.info(f"Lane: {lane_state_obj.__class__.__name__}, Override: {override}")
                 logging.info(f"Crossing State: {state_manager.cross_manager.state}")
                 logging.info(f"Traffic Light State: {state_manager.traffic_manager.state}")
                 logging.info(f"Left Turn State: {left_turn_state}")
+                logging.info(f"COM: {state_info['com_state']}")
                 logging.info(override)
 
             if override: # override happens due to crossing or traffic light
@@ -216,14 +256,17 @@ def main(source: str, is_camera: bool = False):
 
     finally:
         controller.steer(0.0) # Reset steering, because the kart breaks when stopped while wheels are turned
+
         if DEBUG_MODE:
             cap.release()
         else:
             front_camera.release()
             left_camera.release()
             right_camera.release()
+        lidar_detector.stop()
         cv2.destroyAllWindows()
         bus.shutdown()
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Run lane and object detection')
