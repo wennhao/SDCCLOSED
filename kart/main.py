@@ -228,6 +228,7 @@ def main(source: str, is_camera: bool = False):
                 # Ignore state ignores stop sign functionality so it doesn't stay stopped forever
                 # If counter reaches threshold, reset state
                 if stop_sign_ignore_state:
+                    stop_sign_state = False
                     stop_sign_ignore_counter += 1
                     if stop_sign_ignore_counter > stop_sign_ignore_for:
                         stop_sign_ignore_state = False
