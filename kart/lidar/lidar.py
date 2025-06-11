@@ -16,6 +16,10 @@ FRONT_THRESH = 500
 RIGHT_THRESH = 500 # 50 cm
 LEFT_THRESH = 500
 
+"""
+This is a singleton script is used to test the RPLidar A1 device. This script does not work with the kart.
+"""
+
 
 def detect_objects(scan):
 

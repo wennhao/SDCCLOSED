@@ -2,14 +2,14 @@
 
 import sys
 import cv2
-from . import video
+from initcameras.video import get_camera_config
 from typing import Dict
 
 def initialize_cameras() -> Dict[str, cv2.VideoCapture]:
     """
     Initialize the opencv camera capture devices.
     """
-    config: video.CamConfig = video.get_camera_config()
+    config: CamConfig = get_camera_config("initcameras/configs")
     if not config:
         print('No valid video configuration found!', file=sys.stderr)
         exit(1)

@@ -17,13 +17,13 @@ from lidar.lidar_detection import LidarDetector # Class
 logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s')
 
 # Constants
-DEBUG_MODE = True
+DEBUG_MODE = False
 SHOW_VIDEO = False
-DISABLE_OBJECT_DETECTION = True
-DISABLE_LANE_DETECTION = True
-DISABLE_LIDAR = False
+DISABLE_OBJECT_DETECTION = False
+DISABLE_LANE_DETECTION = False
+DISABLE_LIDAR = True # Lidar does not work, disabled by default
 LOG_MODE = True
-LINUX_MODE = False
+LINUX_MODE = True
 
 lidar_port = '/dev/ttyUSB0' if LINUX_MODE else 'com6' # Adjust port based on OS
 # Variables
@@ -37,6 +37,8 @@ frames_after_left_turn_threshold = 15
 ready_to_cross_counter_threshold = 500
 stop_sign_wait_for = 200
 stop_sign_ignore_for = 50
+
+frame_left_counter_test = 0
 
 lidar_front_crash_prevention_distance = 500
 
@@ -63,19 +65,10 @@ def main(source: str, is_camera: bool = False):
         left_camera = cameras["left"]
         right_camera = cameras["right"]
 
-    # Initialize Lidar Detector
-    lidar_detector = LidarDetector(port=lidar_port, baudrate=115200, timeout=1, debug=DEBUG_MODE)
-    lidar_detector.start()  # Start the Lidar thread
-
-    cap = cv2.VideoCapture(int(source) if is_camera else source)
-    if not cap.isOpened():
-        print(f"Error: Could not open {'camera' if is_camera else 'video file'}: {source}")
-        return
-    """
-    cameras = initialize_cameras()
-    # cameras["front"], cameras["left"], cameras["right"]
-    """
-
+    # Lidar setup
+    if not DISABLE_LIDAR:
+        lidar_detector = LidarDetector(port=lidar_port, baudrate=115200, timeout=1, debug=DEBUG_MODE)
+        lidar_detector.start()  # Start the Lidar thread
 
     frame_count = 0
     no_crossing_person_counter = 0
@@ -89,6 +82,8 @@ def main(source: str, is_camera: bool = False):
     stop_sign_counter = 0
     stop_sign_ignore_state = False
     stop_sign_ignore_counter = 0
+    
+    override = False
 
     try:
         while True:
@@ -128,11 +123,19 @@ def main(source: str, is_camera: bool = False):
                 if front_dist < lidar_front_crash_prevention_distance:
                     logging.warning("LIDAR: Obstacle detected in front!")
                     override = True
+            else: 
+                front_dist = 0
+                left_dist = 0
+                right_dist = 0
             """
             
             LANE DETECTION
             This section processes the frame for lane detection and returns the steering command.
             """
+            if left_turn_state:
+                frame_left_counter_test += 1
+                print(frame_left_counter_test)
+            
             if not DISABLE_LANE_DETECTION and frame_count % lane_detection_interval == 0:
                 if left_turn_state:
                     steering_cmd, lane_debug = process_frame(left_camera_frame, "LEFT")
@@ -170,6 +173,7 @@ def main(source: str, is_camera: bool = False):
                     elif label == 'traffic-light-red':
                         detected_red = True
                     elif label == 'traffic-light-green':
+                        detected_red = False
                         detected_green = True
                     elif label == 'one-way-left' or label == 'sign-left-only':
                         left_turn_sign = True
@@ -282,6 +286,7 @@ def main(source: str, is_camera: bool = False):
         bus.shutdown()
 
 
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Run lane and object detection')
     parser.add_argument('source', help='Video file path or "true" to use camera')
@@ -289,7 +294,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     
     use_cameras = False
-    if args.source.lower() == "true":
+    if args.source.lower() == "true": # Put python main.py true to use camera's instead of video file
         use_cameras = True
         source = 0
     else: 

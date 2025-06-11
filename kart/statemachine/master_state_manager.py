@@ -45,11 +45,11 @@ class MasterStateManager:
 
         com_state = self.car_obstacle_manager.update(detected_car, front_dist, left_dist, right_dist)
 
-        match com_state:
+        '''match com_state:
             case "overtaking left":
                 self.lane_state = Left()
             case "overtaking right":
-                self.lane_state = Right()
+                self.lane_state = Right()'''
 
         self.override = crossing_override or traffic_override or stop_sign_state
 

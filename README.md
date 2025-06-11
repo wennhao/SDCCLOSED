@@ -64,6 +64,10 @@ To view all ports run
 ```
 python3 -m serial.tools.list_ports
 ```
+List all available camera's
+```
+ls /dev/video*
+```
 
 LiDAR requires you to install rplidar-roboticia
 if you installed rplidar, please uninstall as it would break the LiDAR sensor
