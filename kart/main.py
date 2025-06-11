@@ -33,7 +33,7 @@ object_detection_interval = 5
 lane_detection_interval = 2
 
 no_crossing_person_threshold = 100
-frames_after_left_turn_threshold = 15
+frames_after_left_turn_threshold = 200
 ready_to_cross_counter_threshold = 500
 stop_sign_wait_for = 200
 stop_sign_ignore_for = 50
@@ -41,6 +41,8 @@ stop_sign_ignore_for = 50
 frame_left_counter_test = 0
 
 lidar_front_crash_prevention_distance = 500
+
+straight_on_crossing_for = 400
 
 def initialize_can():
     if DEBUG_MODE:
@@ -84,6 +86,9 @@ def main(source: str, is_camera: bool = False):
     stop_sign_ignore_counter = 0
     
     override = False
+
+    crossing_found_state = False
+    crossing_found_counter = 0
 
     try:
         while True:
@@ -168,6 +173,7 @@ def main(source: str, is_camera: bool = False):
 
                     if label == 'zebra-crossing':
                         crossbox_position = [x1, y1, x2, y2]
+                        crossing_found_state = True
                     elif label == 'person':
                         manbox_position = [x1, y1, x2, y2]
                     elif label == 'traffic-light-red':
@@ -233,6 +239,15 @@ def main(source: str, is_camera: bool = False):
                 else:
                     stop_sign_ignore_counter = 0
 
+                straight_on_crossing_state = crossing_found_state and not state_manager.get_cross_state()
+                if straight_on_crossing_state:
+                    crossing_found_counter += 1
+                    if crossing_found_counter > straight_on_crossing_for:
+                        crossing_found_state = False
+                        straight_on_crossing_state = False
+                else:
+                    crossing_found_counter = 0
+
             # Display the frame with detected objects and lane markings
             if SHOW_VIDEO:
                 cv2.imshow("Combined View", combined_frame)
@@ -250,7 +265,8 @@ def main(source: str, is_camera: bool = False):
                 detected_green,
                 stop_sign_state,
                 detected_car,
-                front_dist, left_dist, right_dist
+                front_dist, left_dist, right_dist,
+                straight_on_crossing_state
             )
 
             lane_state_obj = state_info['lane_state'] # Gets the current lane state object e.g. Searching, Straight, Left, Right, SharpLeft, SharpRight

@@ -34,7 +34,8 @@ class MasterStateManager:
                 detected_green: bool, 
                 stop_sign_state: bool, 
                 detected_car: bool,
-                front_dist, left_dist, right_dist):
+                front_dist, left_dist, right_dist,
+                straight_on_crossing_state):
         
         self.update_lane_state(steering_cmd)
 
@@ -42,6 +43,9 @@ class MasterStateManager:
         
         self.traffic_manager.update(detected_red, detected_green)
         traffic_override = self.traffic_manager.is_red()
+
+        if straight_on_crossing_state:
+            self.lane_state = Straight()
 
         com_state = self.car_obstacle_manager.update(detected_car, front_dist, left_dist, right_dist)
 
