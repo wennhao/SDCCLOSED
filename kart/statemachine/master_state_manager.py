@@ -10,6 +10,7 @@ class MasterStateManager:
         self.traffic_manager = TrafficLightManager()
         self.car_obstacle_manager = CarObstacleManager()
         self.override = False
+        self.crossing_override = False
 
     def update_lane_state(self, steering_cmd):
         match steering_cmd:
@@ -64,6 +65,9 @@ class MasterStateManager:
             'traffic_state': self.traffic_manager.state,
             'com_state': self.car_obstacle_manager.state
         }
+
+    def get_cross_state(self):
+        return self.crossing_override
 
     def reset_crossing(self):
         self.cross_manager.reset()
