@@ -33,12 +33,10 @@ object_detection_interval = 5
 lane_detection_interval = 2
 
 no_crossing_person_threshold = 100
-frames_after_left_turn_threshold = 15
+frames_after_left_turn_threshold = 40
 ready_to_cross_counter_threshold = 500
 stop_sign_wait_for = 200
 stop_sign_ignore_for = 50
-
-frame_left_counter_test = 0
 
 lidar_front_crash_prevention_distance = 500
 
@@ -132,9 +130,6 @@ def main(source: str, is_camera: bool = False):
             LANE DETECTION
             This section processes the frame for lane detection and returns the steering command.
             """
-            if left_turn_state:
-                frame_left_counter_test += 1
-                print(frame_left_counter_test)
             
             if not DISABLE_LANE_DETECTION and frame_count % lane_detection_interval == 0:
                 if left_turn_state:
