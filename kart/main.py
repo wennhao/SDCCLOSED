@@ -36,7 +36,7 @@ no_crossing_person_threshold = 100
 frames_after_left_turn_threshold = 200
 ready_to_cross_counter_threshold = 500
 stop_sign_wait_for = 200
-stop_sign_ignore_for = 50
+stop_sign_ignore_for = 500
 
 frame_left_counter_test = 0
 
