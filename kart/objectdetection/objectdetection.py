@@ -33,10 +33,10 @@ frame_pool = 10
 frame_threshold = 1
 current_frame = 0
 
-# model = YOLO('withman.pt')
+# model = YOLO('ultra_object_detector_3000.pt')
 
 # model.export(format='openvino') # export in openvino format
-ov_model = YOLO('objectdetection/withman_openvino_model/') # load the exported openvino model
+ov_model = YOLO('objectdetection/ultra_object_detector_3000_openvino_model/') # load the exported openvino model
 
 # path_to_video = 'imgtovid/recording 03-04-2025 15-51-02/output_video.mp4'
 # path_to_camera = 0
