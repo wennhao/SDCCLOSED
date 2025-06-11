@@ -1,7 +1,7 @@
 from statemachine.lane_states import *
 from statemachine.cross_states import CrossManager
 from statemachine.trafficlight_states import TrafficLightManager, TrafficLightState
-from statemachine.carobstacle_states import CarObstacleManager, CarObstacleState
+from statemachine.carobstacle_states import CarObstacleManager, CarObstacleStateEnum
 
 class MasterStateManager:
     def __init__(self):
