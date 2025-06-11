@@ -33,7 +33,7 @@ object_detection_interval = 5
 lane_detection_interval = 2
 
 no_crossing_person_threshold = 100
-frames_after_left_turn_threshold = 200
+frames_after_left_turn_threshold = 40
 ready_to_cross_counter_threshold = 500
 stop_sign_wait_for = 200
 stop_sign_ignore_for = 500
@@ -181,8 +181,8 @@ def main(source: str, is_camera: bool = False):
                         left_turn_state = True
                     elif label == 'stop-sign':
                         stop_sign_state = True
-                    elif label == 'car':
-                        detected_car = True
+                    # elif label == 'car':
+                    #     detected_car = True
 
                 # If one of the left turn signs is detected, set state for as long as the sign is detected + threshold frames
                 # State is used to switch camera sides
