@@ -40,7 +40,7 @@ class MasterStateManager:
         
         self.update_lane_state(steering_cmd)
 
-        crossing_override = self.cross_manager.update(manbox, crossbox)
+        self.crossing_override = self.cross_manager.update(manbox, crossbox)
         
         self.traffic_manager.update(detected_red, detected_green)
         traffic_override = self.traffic_manager.is_red()
@@ -56,7 +56,7 @@ class MasterStateManager:
             case "overtaking right":
                 self.lane_state = Right()'''
 
-        self.override = crossing_override or traffic_override or stop_sign_state
+        self.override = self.crossing_override or traffic_override or stop_sign_state
 
         return {
             'lane_state': self.lane_state,
