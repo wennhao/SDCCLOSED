@@ -1,0 +1,5 @@
+{
+    "front": "/dev/video4",
+    "left": "/dev/video2",
+    "right": "/dev/video0"
+}
