@@ -235,6 +235,9 @@ def main(source: str, is_camera: bool = False):
                 else:
                     stop_sign_ignore_counter = 0
 
+                # if crossing is found, increase counter every frame
+                # If counter reaches threshold, reset crossing state
+                # If the kart is driving straight on a crossing, it will be detected as crossing
                 straight_on_crossing_state = crossing_found_state and not state_manager.get_cross_state()
                 if straight_on_crossing_state:
                     crossing_found_counter += 1
