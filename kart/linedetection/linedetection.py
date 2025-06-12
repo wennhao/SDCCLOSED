@@ -75,16 +75,27 @@ def process_frame(frame, direction):
         
         #visualisation of the lines (not needed for tests)
         cv2.circle(frame, (x_norm, y_at_target), 8, (255, 0, 0), -1)
-
-        if y_at_target < y_norm - 100:
-            return "turning_right_sharp", frame # 1.2
-        elif y_at_target > y_norm + 100:
-            return "turning_left_sharp", frame # (-1.2)
-        elif y_at_target < y_norm - 25:
-            return "turning_right", frame # 0.65
-        elif y_at_target > y_norm + 25:
-            return "turning_left", frame # (-0.65)
-        else:
-            return "driving_straight", frame # 0.0
+        if direction == "RIGHT": 
+            if y_at_target < y_norm - 100:
+                return "turning_right_sharp", frame # 1.2
+            elif y_at_target > y_norm + 100:
+                return "turning_left_sharp", frame # (-1.2)
+            elif y_at_target < y_norm - 25:
+                return "turning_right", frame # 0.65
+            elif y_at_target > y_norm + 25:
+                return "turning_left", frame # (-0.65)
+            else:
+                return "driving_straight", frame # 0.0
+        elif direction == "LEFT":
+            if y_at_target < y_norm - 100:
+                return "turning_left_sharp", frame # (-1.2)
+            elif y_at_target > y_norm + 100:
+                return "turning_right_sharp", frame # 1.2
+            elif y_at_target < y_norm - 25:
+                return "turning_left", frame # (-0.65)
+            elif y_at_target > y_norm + 25:
+                return "turning_right", frame # 0.65
+            else:
+                return "driving_straight", frame # 0.0
     else:
         return "searching_lane", frame
