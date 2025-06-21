@@ -1,9 +1,7 @@
 # SDCCLOSED
 
 ## Get Started
-This project requires Python, Flask, OpenCV and numpy to run
-
-[Flask Documentation](https://flask.palletsprojects.com/en/stable/)
+This project requires Python installed
 
 [OpenCV](https://docs.opencv.org/4.x/d6/d00/tutorial_py_root.html)
 

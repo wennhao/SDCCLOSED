@@ -39,17 +39,6 @@ def generate_frames():
             maxLineGap=25
         )
 
-        # fill polygons for lanes (needs mask)
-        '''polygon_points = []
-        if lines is not None:
-            for line in lines:
-                polygon_points.append((line[0][0], line[0][1]))
-                polygon_points.append((line[0][2], line[0][3]))
-        
-        if len(polygon_points) > 0:
-            polygon_points = np.array(polygon_points, dtype=np.int32).reshape((-1, 1, 2))
-
-            line_image = cv2.fillPoly(frame, [polygon_points], color=(0, 255, 0))'''
 
         results = model(frame)
         boxes = results[0].boxes
@@ -71,7 +60,3 @@ def generate_frames():
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
         
-        # cv2.imshow('Camera', frame)
-
-        # if cv2.waitKey(1) == ord('q'):
-        #     break
