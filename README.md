@@ -77,3 +77,9 @@ Change to the file you want to run, use python3 `file_name.py` to run the file o
 > Make sure your code is tested thoroughly!
 > Add a way to stop the kart with a button.
 
+
+## Credits
+
+[Peter](https://github.com/Draqy)
+[Jordy](https://github.com/PoleLord)
+[Wen](https://github.com/wennhao)
