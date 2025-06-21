@@ -80,6 +80,6 @@ Change to the file you want to run, use python3 `file_name.py` to run the file o
 
 ## Credits
 
-[Peter](https://github.com/Draqy)
-[Jordy](https://github.com/PoleLord)
-[Wen](https://github.com/wennhao)
+[Peter](https://github.com/Draqy)  
+[Jordy](https://github.com/PoleLord)  
+[Wen](https://github.com/wennhao)  
