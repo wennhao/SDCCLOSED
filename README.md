@@ -6,7 +6,7 @@ This project requires Python installed
 [OpenCV](https://docs.opencv.org/4.x/d6/d00/tutorial_py_root.html)
 
 
-## How to run the project for TESTING
+## How to run the project for TESTING locally using venv
 > [!IMPORTANT]
 > This project requires python 3.12 installed
 > Open up your **terminal** and run the following commands
@@ -42,13 +42,28 @@ download the needed libraries
 pip install -r requirements.txt
 ```
 
-To test the kart brain
+Now you are ready to test the code
+To test the kart brain with a video, first navigate to the right folder
 ```
-python kart\main.py <video_path>
+cd kart     (depending on your current folder)
 ```
+
+Run the main controller code with a video:
+```
+python main.py <video_path>
+```
+for example
 ```
 python main.py videos\output_video.mp4
 ```
+(or 'python3' instead of 'python'. this depends on what you have installed)
+
+Or run the main controller code with a camera:
+```
+python main.py true
+```
+(Adding the argument 'true' will make the code use the standard camera configuration for the kart instead of a video.
+If you want to test with your own camera which is not on the kart, change the camera config in kart/configs/kart1.json)
 
 Success! The dashboard is now running on [localhost]([localhost:](http://127.0.0.1:7890/))
 
@@ -57,7 +72,7 @@ Success! The dashboard is now running on [localhost]([localhost:](http://127.0.0
 deactivate
 ```
 
-## Tips
+## Important tips!
 To view all ports run 
 ```
 python3 -m serial.tools.list_ports
@@ -71,7 +86,16 @@ LiDAR requires you to install rplidar-roboticia
 if you installed rplidar, please uninstall as it would break the LiDAR sensor
 
 ## Running on the kart
-Change to the file you want to run, use python3 `file_name.py` to run the file on the kart
+When running on the NUC on the kart, you will not need to activate a venv like you would when testing locally
+
+1. Setup Tailscale between your device and the kart. (This can only be done on one laptop at a time)
+2. Copy the IP address of the NUC given to you by Tailscale.
+3. Connect to this IP address using ssh in VSCode.
+4. Enter the password which you use to enter the NUC.
+6. pull this SDCCLOSED folder from GitHub.
+5. Locate the folder.
+6. Run the command: 'python3 main.py true'
+The kart should now be functioning as the final product of SDC 2025
 
 > [!IMPORTANT]
 > Make sure your code is tested thoroughly!
@@ -83,3 +107,4 @@ Change to the file you want to run, use python3 `file_name.py` to run the file o
 [Peter](https://github.com/Draqy)  
 [Jordy](https://github.com/PoleLord)  
 [Wen](https://github.com/wennhao)  
+[Long](https://github.com/dimsumtime)
