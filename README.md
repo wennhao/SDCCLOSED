@@ -65,8 +65,6 @@ python main.py true
 (Adding the argument 'true' will make the code use the standard camera configuration for the kart instead of a video.
 If you want to test with your own camera which is not on the kart, change the camera config in kart/configs/kart1.json)
 
-Success! The dashboard is now running on [localhost]([localhost:](http://127.0.0.1:7890/))
-
 #### When you're done
 ```
 deactivate
@@ -88,7 +86,7 @@ if you installed rplidar, please uninstall as it would break the LiDAR sensor
 ## Running on the kart
 When running on the NUC on the kart, you will not need to activate a venv like you would when testing locally
 
-1. Setup Tailscale between your device and the kart. (This can only be done on one laptop at a time)
+1. Setup Tailscale between your device and the kart. (This can only be done on one device at a time)
 2. Copy the IP address of the NUC given to you by Tailscale.
 3. Connect to this IP address using ssh in VSCode.
 4. Enter the password which you use to enter the NUC.
@@ -107,4 +105,3 @@ The kart should now be functioning as the final product of SDC 2025
 [Peter](https://github.com/Draqy)  
 [Jordy](https://github.com/PoleLord)  
 [Wen](https://github.com/wennhao)  
-[Long](https://github.com/dimsumtime)
