@@ -5,6 +5,23 @@ This project requires Python installed
 
 [OpenCV](https://docs.opencv.org/4.x/d6/d00/tutorial_py_root.html)
 
+## Kart folder
+In the folder 'kart' you will find our code to controller the kart.
+This folder consists of different folders, each play a supporting role to main.py
+- initcameras contains functions which initialise the cameras for main.py to use
+- lidar contains functions which reads the LiDAR values
+- linedetection contains functions which help the kart stay within its lane and is primarily responsable for the steering logic of the kart using the side cameras
+- movement contains functions which send CAN-bus messages to the kart. This gives the code the ability to make the kart move, steer and brake used by carcontroller.py
+- objectdetection contains the functions which return the objects which are detected by the front camera of the kart
+- statemachine contains the different states the kart can have and processes those in master_state_manager.py
+The main codes in the 'kart' folder:
+- carcontroller.py: this is used by main.py to control the kart
+- main.py: main control unit which combines all previously stated functions. this is the code that is ran for full tests and finals
+
+other:
+- camerarecorder: with datarecorder.py the kart cameras can be used to film the track
+- video contains a video for the testing of object detection
+- helper contains a helper function
 
 ## How to run the project for TESTING locally using venv
 > [!IMPORTANT]
